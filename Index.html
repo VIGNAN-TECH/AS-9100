@@ -1,0 +1,1741 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AS-9100 Training Portal</title>
+<style>
+/* ══════════════════════════════════════════════════
+   CSS VARIABLES — NIGHT MODE (default)
+══════════════════════════════════════════════════ */
+:root {
+  --bg:       #0a0e1a;
+  --deep:     #0d1528;
+  --panel:    #111c35;
+  --card:     #152244;
+  --card2:    #0f1a30;
+  --accent:   #00c8ff;
+  --gold:     #f5b000;
+  --green:    #00e8a2;
+  --red:      #ff4060;
+  --text:     #dce8f5;
+  --text2:    #c0d4e8;
+  --muted:    #7a9ab8;
+  --border:   rgba(0,200,255,0.18);
+  --topbar-bg:linear-gradient(90deg,#060810 0%,#0d2040 45%,#0a1a30 60%,#060810 100%);
+  --topbar-border:#00c8ff;
+  --shadow:   0 0 28px rgba(0,200,255,0.28);
+  --card-shadow:0 4px 24px rgba(0,0,0,0.45);
+  --btn-bg:   rgba(0,200,255,0.10);
+  --viewer-bg:#0a0e1a;
+  --tag-bg:   rgba(0,200,255,0.10);
+}
+
+/* ══════════════════════════════════════════════════
+   DAY MODE
+══════════════════════════════════════════════════ */
+body.day {
+  --bg:       #eef3f9;
+  --deep:     #dce7f3;
+  --panel:    #e4edf8;
+  --card:     #f5f9ff;
+  --card2:    #eaf1fb;
+  --accent:   #0077cc;
+  --gold:     #c47a00;
+  --green:    #007a55;
+  --red:      #d4002e;
+  --text:     #1a2636;
+  --text2:    #2c3e55;
+  --muted:    #5a7a9a;
+  --border:   rgba(0,120,200,0.22);
+  --topbar-bg:linear-gradient(90deg,#1a3a6a 0%,#1e5099 45%,#1a3a6a 100%);
+  --topbar-border:#0077cc;
+  --shadow:   0 0 28px rgba(0,100,200,0.2);
+  --card-shadow:0 4px 20px rgba(0,0,0,0.12);
+  --btn-bg:   rgba(0,120,200,0.08);
+  --viewer-bg:#ffffff;
+  --tag-bg:   rgba(0,100,200,0.08);
+}
+
+/* ══════════════════════════════════════════════════
+   BASE
+══════════════════════════════════════════════════ */
+* { margin:0; padding:0; box-sizing:border-box; }
+html, body { width:100%; height:100%; overflow:hidden; }
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 13px;
+  display: flex;
+  flex-direction: column;
+  transition: background 0.35s, color 0.35s;
+}
+
+/* ══════════════════════════════════════════════════
+   TOPBAR
+══════════════════════════════════════════════════ */
+.topbar {
+  background: var(--topbar-bg);
+  border-bottom: 2.5px solid var(--topbar-border);
+  padding: 0 2rem;
+  flex-shrink: 0;
+  display: flex; align-items: center; justify-content: space-between;
+  height: 62px;
+  box-shadow: var(--shadow);
+  z-index: 200;
+}
+.topbar-left { display:flex; align-items:center; gap:1rem; }
+.logo-badge {
+  background: var(--accent); color: #fff;
+  font-family: Arial, sans-serif; font-weight: 700; font-size: 14px;
+  padding: 5px 16px; letter-spacing: 2px; border-radius: 3px;
+}
+body.day .logo-badge { color: #fff; }
+.topbar h1 {
+  font-family: Arial, sans-serif; font-weight: 700; font-size: 20px;
+  letter-spacing: 3px; color: #fff;
+  text-shadow: 0 0 18px rgba(0,200,255,0.5);
+}
+.topbar h1 span { color: var(--accent); }
+body.day .topbar h1 { text-shadow: none; color: #e0eeff; }
+body.day .topbar h1 span { color: #7dd4ff; }
+
+.nav-right { display:flex; align-items:center; gap:0.5rem; }
+.nav-tabs { display:flex; gap:0.25rem; }
+.nav-tab {
+  background: transparent; border: 1px solid transparent;
+  color: rgba(255,255,255,0.55);
+  font-family: Arial, sans-serif; font-weight: 700;
+  font-size: 13px; letter-spacing: 1px; padding: 7px 20px; cursor: pointer;
+  border-radius: 3px; transition: all 0.25s;
+}
+.nav-tab:hover { color: #fff; border-color: rgba(255,255,255,0.3); }
+.nav-tab.active { background: rgba(255,255,255,0.15); border-color: rgba(255,255,255,0.5); color: #fff; }
+
+/* Day/Night toggle */
+.theme-toggle {
+  background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.3);
+  color: #fff; font-size: 18px; width: 40px; height: 36px;
+  border-radius: 20px; cursor: pointer; transition: all 0.3s;
+  display: flex; align-items: center; justify-content: center;
+  margin-left: 0.5rem;
+}
+.theme-toggle:hover { background: rgba(255,255,255,0.2); }
+
+/* ══════════════════════════════════════════════════
+   MAIN AREA
+══════════════════════════════════════════════════ */
+.main-area { flex:1; overflow:hidden; position:relative; }
+.section {
+  display: none; width:100%; height:100%; overflow-y:auto;
+  padding: 0.8rem 1.6rem 1rem;
+}
+.section.active { display:flex; flex-direction:column; }
+
+/* ══════════════════════════════════════════════════
+   HERO STRIP — compact, no overflow
+══════════════════════════════════════════════════ */
+.hero {
+  text-align: center; padding: 0.65rem 1rem 0.5rem; flex-shrink: 0;
+  background: radial-gradient(ellipse 80% 120% at 50% 0%, rgba(0,200,255,0.04) 0%, transparent 70%);
+}
+body.day .hero { background: radial-gradient(ellipse 80% 120% at 50% 0%, rgba(0,100,200,0.03) 0%, transparent 70%); }
+.hero-sub {
+  font-family: Arial, sans-serif; font-weight: 700;
+  color: var(--accent); font-size: 10px; letter-spacing: 4px;
+  text-transform: uppercase; margin-bottom: 0.25rem;
+}
+.hero h2 {
+  font-family: Arial, sans-serif; font-size: 22px; font-weight: 700;
+  color: var(--text); letter-spacing: 1.5px; line-height: 1.15;
+}
+body.day .hero h2 { color: #142035; }
+.hero h2 span { color: var(--gold); }
+.hero-desc {
+  color: var(--muted); max-width: 600px; margin: 0.25rem auto 0;
+  font-size: 13px; line-height: 1.55;
+}
+body.day .hero-desc { color: #4a6a88; }
+
+/* ══════════════════════════════════════════════════
+   PROGRESS TRACKER
+══════════════════════════════════════════════════ */
+.progress-track {
+  display:flex; align-items:center; gap:0.35rem;
+  padding: 0.5rem 0; flex-shrink:0; overflow-x:auto; scrollbar-width:none;
+}
+.progress-track::-webkit-scrollbar { display:none; }
+.prog-step { display:flex; flex-direction:column; align-items:center; gap:0.2rem; min-width:50px; }
+.prog-circle {
+  width:34px; height:34px; border-radius:50%;
+  background: var(--panel); border: 2px solid var(--border);
+  display:flex; align-items:center; justify-content:center;
+  font-family:Arial,sans-serif; font-weight:700; font-size:12px;
+  color: var(--muted); transition: all 0.4s;
+}
+.prog-circle.done {
+  background: rgba(0,200,255,0.15); border-color: var(--accent);
+  color: var(--accent); box-shadow: 0 0 10px rgba(0,200,255,0.3);
+}
+body.day .prog-circle.done { background: rgba(0,119,204,0.12); box-shadow: 0 0 8px rgba(0,100,200,0.2); }
+.prog-label { font-size: 11px; color: var(--muted); font-family: Arial, sans-serif; }
+.prog-line { flex:1; height:2px; background:var(--border); min-width:14px; transition: background 0.4s; }
+.prog-line.done { background: var(--accent); }
+
+/* ══════════════════════════════════════════════════
+   CLAUSE GRID
+══════════════════════════════════════════════════ */
+.clause-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 1rem; flex:1;
+  align-content: start;
+  padding-bottom: 1rem;
+}
+@media(max-width:1100px){ .clause-grid{ grid-template-columns:repeat(3,1fr); } }
+@media(max-width:700px){  .clause-grid{ grid-template-columns:repeat(2,1fr); } }
+
+.clause-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 1.2rem 1.1rem;
+  position: relative; cursor: pointer;
+  transition: border-color 0.25s, transform 0.25s, box-shadow 0.25s;
+  min-height: 165px; overflow: hidden;
+  box-shadow: var(--card-shadow);
+  display: flex; flex-direction: column;
+}
+
+.clause-number {
+  font-family: Arial, sans-serif; font-size: 52px; font-weight: 700;
+  color: var(--border); position: absolute; top: 0.5rem; right: 0.8rem;
+  line-height: 1; transition: color 0.25s; user-select: none;
+}
+.clause-card:hover .clause-number { color: rgba(0,200,255,0.3); }
+.cc-gold:hover .clause-number { color: rgba(245,176,0,0.3) !important; }
+.cc-green:hover .clause-number { color: rgba(0,232,162,0.3) !important; }
+.cc-red:hover .clause-number { color: rgba(255,64,96,0.3) !important; }
+
+.clause-badge {
+  display: inline-block; font-family: Arial, sans-serif; font-size: 11px;
+  font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase;
+  background: var(--tag-bg); color: var(--accent);
+  padding: 3px 10px; border-radius: 3px; margin-bottom: 0.45rem;
+  border: 1px solid var(--border);
+}
+.cc-gold .clause-badge { color: var(--gold); }
+.cc-green .clause-badge { color: var(--green); }
+.cc-red .clause-badge { color: var(--red); }
+
+.clause-title {
+  font-family: Arial, sans-serif; font-size: 17px; font-weight: 700;
+  color: var(--text); letter-spacing: 0.3px; margin-bottom: 0.5rem;
+  line-height: 1.25; padding-right: 2.8rem;
+}
+.card-brief {
+  font-family: Arial, sans-serif; font-size: 14px;
+  color: var(--muted); line-height: 1.7;
+}
+.card-hint {
+  position: absolute; bottom: 0.6rem; right: 0.8rem;
+  font-size: 10px; font-family: Arial, sans-serif; font-weight: 700;
+  color: var(--accent); opacity: 0.45; letter-spacing: 1.5px;
+}
+
+/* ══════════════════════════════════════════════════
+   FULLSCREEN OVERLAY — FIXED HEADER · 50/50 SPLIT
+══════════════════════════════════════════════════ */
+.overlay-backdrop {
+  display: none; position: fixed; inset: 0; z-index: 500;
+  background: rgba(4,6,14,0.97); backdrop-filter: blur(14px);
+}
+body.day .overlay-backdrop { background: rgba(10,25,55,0.85); }
+.overlay-backdrop.open { display: flex; flex-direction: column; animation: fadeIn 0.2s ease; }
+@keyframes fadeIn  { from{opacity:0}              to{opacity:1} }
+@keyframes slideUp { from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:translateY(0)} }
+
+/* Panel = full viewport, flex column */
+.overlay-panel {
+  width: 100vw; height: 100vh;
+  display: flex; flex-direction: column;
+  background: var(--deep);
+  border-top: 4px solid var(--accent);
+  overflow: hidden;
+  animation: slideUp 0.28s cubic-bezier(0.23,1,0.32,1);
+}
+body.day .overlay-panel { background: #eef4fc; }
+.overlay-panel.gold-b  { border-top-color: var(--gold); }
+.overlay-panel.green-b { border-top-color: var(--green); }
+.overlay-panel.red-b   { border-top-color: var(--red); }
+
+/* ── HEADER: fixed height, never scrolls ── */
+.overlay-header {
+  flex-shrink: 0;
+  height: 82px;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 2.5rem;
+  border-bottom: 1px solid var(--border);
+  background: linear-gradient(90deg, rgba(0,200,255,0.05) 0%, transparent 55%);
+}
+body.day .overlay-header {
+  background: linear-gradient(90deg, rgba(0,100,200,0.05) 0%, transparent 55%);
+  border-bottom-color: rgba(0,100,200,0.14);
+}
+.overlay-panel.gold-b  .overlay-header { background: linear-gradient(90deg, rgba(245,176,0,0.06) 0%, transparent 55%); }
+.overlay-panel.green-b .overlay-header { background: linear-gradient(90deg, rgba(0,232,162,0.06) 0%, transparent 55%); }
+.overlay-panel.red-b   .overlay-header { background: linear-gradient(90deg, rgba(255,64,96,0.06) 0%, transparent 55%); }
+
+.overlay-header-left { display: flex; align-items: center; gap: 1.4rem; }
+.overlay-big-num {
+  font-family: Arial, sans-serif; font-size: 64px; font-weight: 700;
+  color: rgba(0,200,255,0.12); line-height: 1; user-select: none; flex-shrink: 0;
+}
+body.day .overlay-big-num { color: rgba(0,100,200,0.09); }
+.overlay-panel.gold-b  .overlay-big-num { color: rgba(245,176,0,0.16); }
+.overlay-panel.green-b .overlay-big-num { color: rgba(0,232,162,0.16); }
+.overlay-panel.red-b   .overlay-big-num { color: rgba(255,64,96,0.16); }
+
+.ov-badge {
+  font-family: Arial, sans-serif; font-size: 10px; font-weight: 700;
+  letter-spacing: 3.5px; text-transform: uppercase;
+  color: var(--accent); margin-bottom: 0.18rem;
+}
+.overlay-panel.gold-b  .ov-badge { color: var(--gold); }
+.overlay-panel.green-b .ov-badge { color: var(--green); }
+.overlay-panel.red-b   .ov-badge { color: var(--red); }
+
+.ov-heading {
+  font-family: Arial, sans-serif; font-size: 26px; font-weight: 700;
+  color: var(--text); letter-spacing: 0.3px; line-height: 1.1;
+}
+body.day .ov-heading { color: #162640; }
+
+.ov-esc-hint {
+  font-family: Arial, sans-serif; font-size: 10px;
+  color: var(--muted); letter-spacing: 0.5px; margin-top: 0.15rem;
+}
+
+.overlay-close {
+  flex-shrink: 0;
+  background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.14);
+  color: var(--muted); font-size: 20px; width: 44px; height: 44px;
+  border-radius: 50%; cursor: pointer; transition: all 0.2s;
+  display: flex; align-items: center; justify-content: center; font-weight: 700;
+}
+body.day .overlay-close { background: rgba(0,0,0,0.05); border-color: rgba(0,0,0,0.14); color: #5a7a9a; }
+.overlay-close:hover { background: rgba(255,64,96,0.14); border-color: var(--red); color: var(--red); }
+
+/* ── BODY: remaining height, horizontal split ── */
+.overlay-body {
+  flex: 1; min-height: 0;
+  display: flex; flex-direction: row;
+  overflow: hidden;
+}
+
+/* LEFT pane — exactly 50% width, scrollable */
+.ov-left {
+  width: 50%;
+  flex-shrink: 0;
+  overflow-y: auto;
+  padding: 1.8rem 2rem 2rem 2.5rem;
+  border-right: 1px solid var(--border);
+  scrollbar-width: thin;
+  scrollbar-color: var(--accent) transparent;
+}
+body.day .ov-left { border-right-color: rgba(0,100,200,0.13); }
+
+/* RIGHT pane — exactly 50% width, scrollable */
+.ov-right {
+  width: 50%;
+  flex-shrink: 0;
+  overflow-y: auto;
+  padding: 1.8rem 2.2rem 2rem 2rem;
+  display: flex; flex-direction: column; gap: 1.2rem;
+  scrollbar-width: thin;
+  scrollbar-color: var(--accent) transparent;
+}
+
+/* ── TEXT CONTENT BLOCKS (left pane) ── */
+.ov-block {
+  margin-bottom: 1.5rem;
+  padding-left: 1rem;
+  border-left: 3px solid var(--accent);
+}
+.overlay-panel.gold-b  .ov-block { border-left-color: var(--gold); }
+.overlay-panel.green-b .ov-block { border-left-color: var(--green); }
+.overlay-panel.red-b   .ov-block { border-left-color: var(--red); }
+.ov-block:last-child { margin-bottom: 0; }
+
+.ov-block-title {
+  font-family: Arial, sans-serif; font-size: 10px; font-weight: 700;
+  letter-spacing: 3px; text-transform: uppercase;
+  color: var(--accent); margin-bottom: 0.55rem;
+}
+.overlay-panel.gold-b  .ov-block-title { color: var(--gold); }
+.overlay-panel.green-b .ov-block-title { color: var(--green); }
+.overlay-panel.red-b   .ov-block-title { color: var(--red); }
+
+.ov-block ul { list-style: none; padding: 0; margin: 0; }
+.ov-block ul li {
+  font-family: Arial, sans-serif; font-size: 15px;
+  color: var(--text); line-height: 1.85;
+  padding: 3px 0 3px 20px; position: relative;
+}
+body.day .ov-block ul li { color: #1c3050; }
+.ov-block ul li::before {
+  content: '▸'; position: absolute; left: 0; top: 6px;
+  font-size: 10px; color: var(--accent);
+}
+.overlay-panel.gold-b  .ov-block ul li::before { color: var(--gold); }
+.overlay-panel.green-b .ov-block ul li::before { color: var(--green); }
+.overlay-panel.red-b   .ov-block ul li::before { color: var(--red); }
+
+.ov-block p {
+  font-family: Arial, sans-serif; font-size: 15px;
+  color: var(--text); line-height: 1.9;
+}
+body.day .ov-block p { color: #1c3050; }
+
+/* Tags */
+.ov-tags-wrap { display: flex; flex-wrap: wrap; gap: 0.45rem; }
+.ov-tag {
+  font-family: Arial, sans-serif; font-size: 12px; font-weight: 700;
+  padding: 5px 14px; border-radius: 20px;
+  background: var(--tag-bg); color: var(--accent);
+  border: 1px solid rgba(0,200,255,0.28);
+}
+body.day .ov-tag { background: rgba(0,100,200,0.07); border-color: rgba(0,100,200,0.22); }
+.ov-tag.gold  { background: rgba(245,176,0,0.09);  color: var(--gold);  border-color: rgba(245,176,0,0.32); }
+.ov-tag.red   { background: rgba(255,64,96,0.09);  color: var(--red);   border-color: rgba(255,64,96,0.32); }
+.ov-tag.green { background: rgba(0,232,162,0.09);  color: var(--green); border-color: rgba(0,232,162,0.32); }
+
+/* ── DIAGRAM WRAPPER (right pane) ── */
+.ov-diagram-wrap {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 1.2rem 1.4rem 1.4rem;
+  flex: 1;
+  display: flex; flex-direction: column;
+}
+body.day .ov-diagram-wrap { background: rgba(0,0,0,0.02); border-color: rgba(0,100,200,0.12); }
+
+.ov-diagram-title {
+  font-family: Arial, sans-serif; font-size: 10px; font-weight: 700;
+  letter-spacing: 3px; text-transform: uppercase;
+  color: var(--gold); margin-bottom: 1rem; padding-bottom: 0.5rem;
+  border-bottom: 1px solid rgba(245,176,0,0.22); flex-shrink: 0;
+}
+body.day .ov-diagram-title { color: #b07800; border-bottom-color: rgba(160,100,0,0.18); }
+
+.ov-diagram-wrap svg {
+  flex: 1; width: 100%; height: auto;
+  overflow: visible;
+}
+.svg-label { font-family: Arial, Helvetica, sans-serif; }
+
+
+/* ══════════════════════════════════════════════════
+   MIND MAP
+══════════════════════════════════════════════════ */
+.mm-canvas { max-width:1200px; width:100%; margin:0 auto; }
+.mm-phase { margin-bottom: 0.6rem; }
+.mm-phase-label {
+  font-family: Arial, sans-serif; font-size: 11px; font-weight: 700;
+  letter-spacing: 3px; text-transform: uppercase;
+  color: var(--muted); margin-bottom: 0.4rem; padding-left: 0.5rem;
+}
+.mm-phase-label.red-lbl { color: var(--red); }
+.mm-row { display:flex; gap:0.75rem; align-items:stretch; }
+.mm-node {
+  flex: 1; background: var(--panel); border: 1px solid var(--border);
+  border-radius: 5px; padding: 1rem 1.1rem; cursor: pointer;
+  position: relative; transition: all 0.25s; min-width: 0;
+  box-shadow: var(--card-shadow);
+}
+.mm-node:hover { background: var(--card); border-color: var(--accent); transform: translateY(-3px); box-shadow: var(--shadow); }
+.mm-node.accent-l { border-left: 3px solid var(--accent); }
+.mm-node.gold-l   { border-left: 3px solid var(--gold); }
+.mm-node.green-l  { border-left: 3px solid var(--green); }
+.mm-node.red-l    { border-left: 3px solid var(--red); }
+.mm-node-num {
+  font-family: Arial, sans-serif; font-size: 32px; font-weight: 700;
+  color: var(--border); position: absolute; top: 0.4rem; right: 0.7rem;
+  line-height: 1; user-select: none;
+}
+.mm-node-tag {
+  font-family: Arial, sans-serif; font-size: 11px; font-weight: 700;
+  letter-spacing: 2px; text-transform: uppercase; color: var(--accent); margin-bottom: 0.2rem;
+}
+.mm-node.gold-l .mm-node-tag   { color: var(--gold); }
+.mm-node.green-l .mm-node-tag  { color: var(--green); }
+.mm-node.red-l .mm-node-tag    { color: var(--red); }
+.mm-node-title {
+  font-family: Arial, sans-serif; font-size: 14px; font-weight: 700;
+  color: var(--text); margin-bottom: 0.35rem;
+}
+.mm-node-pts { list-style: none; }
+.mm-node-pts li {
+  font-family: Arial, sans-serif; font-size: 12px; color: var(--muted);
+  padding: 2px 0 2px 12px; position: relative;
+}
+.mm-node-pts li::before { content:'·'; color:var(--accent); position:absolute; left:0; font-size:14px; top:0; }
+.mm-connector {
+  text-align: center; color: var(--accent); opacity: 0.35;
+  font-size: 16px; padding: 0.15rem 0; letter-spacing: 3px;
+}
+.mm-ops-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:0.5rem; margin-top:0.5rem; }
+@media(max-width:800px){ .mm-ops-grid{ grid-template-columns:repeat(2,1fr); } }
+.mm-ops-cell {
+  background: rgba(255,64,96,0.05); border: 1px solid rgba(255,64,96,0.18);
+  border-radius: 4px; padding: 0.5rem 0.6rem;
+}
+body.day .mm-ops-cell { background: rgba(212,0,46,0.04); border-color: rgba(212,0,46,0.15); }
+.mm-ops-cell-tag { font-family:Arial,sans-serif; font-size:11px; font-weight:700; color:var(--red); margin-bottom:2px; }
+.mm-ops-cell-txt { font-family:Arial,sans-serif; font-size:12px; color:var(--text2); }
+.mm-cycle {
+  text-align:center; padding:0.65rem; margin-top:0.5rem;
+  background: rgba(0,200,255,0.03); border:1px dashed rgba(0,200,255,0.22); border-radius:4px;
+}
+body.day .mm-cycle { background: rgba(0,100,200,0.03); border-color: rgba(0,100,200,0.2); }
+.mm-cycle span { font-family:Arial,sans-serif; font-size:12px; font-weight:700; color:var(--accent); letter-spacing:2px; }
+.mm-legend {
+  display:flex; gap:1.2rem; flex-wrap:wrap; justify-content:center;
+  margin-top:0.8rem; padding-top:0.75rem; border-top:1px solid var(--border);
+}
+.mm-li { display:flex; align-items:center; gap:0.35rem; font-family:Arial,sans-serif; font-size:12px; color:var(--muted); }
+.mm-dot { width:10px; height:10px; border-radius:50%; }
+
+/* ══════════════════════════════════════════════════
+   Q&A SECTION
+══════════════════════════════════════════════════ */
+.qa-layout { display:grid; grid-template-columns:360px 1fr; gap:1.2rem; flex:1; min-height:0; }
+@media(max-width:900px){ .qa-layout{ grid-template-columns:1fr; } }
+.qa-left { display:flex; flex-direction:column; gap:0.8rem; overflow-y:auto; min-height:0; }
+
+.upload-zone {
+  background: var(--card); border: 2px dashed rgba(0,200,255,0.35);
+  border-radius: 6px; padding: 1.4rem; text-align:center; cursor:pointer;
+  transition: all 0.3s; flex-shrink:0;
+}
+body.day .upload-zone { border-color: rgba(0,100,200,0.35); }
+.upload-zone:hover,.upload-zone.drag-over { border-color:var(--accent); background:rgba(0,200,255,0.04); }
+body.day .upload-zone:hover { background:rgba(0,100,200,0.04); }
+.upload-icon { font-size:2rem; margin-bottom:0.4rem; opacity:0.65; }
+.upload-zone h3 { font-family:Arial,sans-serif; font-size:15px; font-weight:700; color:var(--text); letter-spacing:1px; }
+.upload-zone p { color:var(--muted); font-size:12px; margin:0.3rem 0 0.8rem; line-height:1.5; }
+.upload-btn {
+  background: transparent; border:1px solid var(--accent); color:var(--accent);
+  font-family:Arial,sans-serif; font-weight:700; letter-spacing:1px;
+  font-size:13px; padding:6px 22px; cursor:pointer; border-radius:3px; transition:all 0.25s;
+}
+.upload-btn:hover { background: var(--btn-bg); }
+#fileInput { display:none; }
+
+.file-list-panel {
+  background: var(--card); border:1px solid var(--border);
+  border-radius:6px; padding:1rem; flex:1; overflow-y:auto; min-height:0;
+}
+.panel-title {
+  font-family:Arial,sans-serif; font-size:12px; font-weight:700;
+  letter-spacing:2px; text-transform:uppercase;
+  color:var(--accent); margin-bottom:0.7rem; padding-bottom:0.4rem;
+  border-bottom:1px solid var(--border);
+}
+
+/* Clause selector for each file */
+.file-item-wrap { border-bottom:1px solid var(--border); padding:0.6rem 0; }
+.file-item-wrap:last-child { border-bottom:none; }
+.file-item {
+  display:flex; align-items:center; gap:0.6rem;
+  padding:0.3rem 0.5rem; border-radius:4px; cursor:pointer;
+  transition:background 0.2s;
+}
+.file-item:hover { background: rgba(0,200,255,0.05); }
+body.day .file-item:hover { background: rgba(0,100,200,0.05); }
+.file-item.active-file { background:rgba(0,200,255,0.08); border-left:3px solid var(--accent); padding-left:0.3rem; }
+body.day .file-item.active-file { background:rgba(0,100,200,0.08); }
+.file-icon-lg { font-size:1.3rem; }
+.file-info { flex:1; min-width:0; }
+.file-name { font-family:Arial,sans-serif; font-size:13px; font-weight:700; color:var(--text); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.file-meta { font-family:Arial,sans-serif; font-size:11px; color:var(--muted); }
+.file-actions { display:flex; gap:0.3rem; flex-shrink:0; }
+.fa-btn {
+  background:none; border:1px solid var(--border); color:var(--muted);
+  font-size:12px; font-family:Arial,sans-serif; padding:3px 8px;
+  cursor:pointer; border-radius:2px; transition:all 0.2s; white-space:nowrap;
+}
+.fa-btn.open-btn { border-color:rgba(0,200,255,0.4); color:var(--accent); }
+.fa-btn.open-btn:hover { background:var(--btn-bg); }
+.fa-btn.del-btn:hover { border-color:var(--red); color:var(--red); }
+
+/* Clause tag row */
+.clause-tag-row { display:flex; gap:0.25rem; flex-wrap:wrap; margin:0.35rem 0 0 0.5rem; }
+.ct-label { font-family:Arial,sans-serif; font-size:11px; color:var(--muted); align-self:center; margin-right:0.1rem; }
+.ct-pill {
+  font-family:Arial,sans-serif; font-size:11px; font-weight:700;
+  padding:2px 8px; border-radius:10px; border:1px solid var(--border);
+  color:var(--muted); cursor:pointer; transition:all 0.2s; background:transparent;
+}
+.ct-pill:hover { border-color:var(--accent); color:var(--accent); }
+.ct-pill.tagged { background:rgba(0,200,255,0.12); border-color:var(--accent); color:var(--accent); }
+body.day .ct-pill.tagged { background:rgba(0,100,200,0.10); }
+
+.empty-msg { color:var(--muted); font-family:Arial,sans-serif; font-size:13px; text-align:center; padding:1.5rem 0; line-height:1.7; }
+
+/* Clause filter row */
+.cf-section { background:var(--card); border:1px solid var(--border); border-radius:6px; padding:0.8rem; flex-shrink:0; }
+.cf-row { display:flex; gap:0.35rem; flex-wrap:wrap; margin-top:0.45rem; }
+.cf-btn {
+  background:transparent; border:1px solid var(--border);
+  color:var(--muted); font-family:Arial,sans-serif; font-size:12px; font-weight:700;
+  padding:4px 12px; cursor:pointer; border-radius:3px; transition:all 0.2s;
+}
+.cf-btn:hover,.cf-btn.active { background:var(--btn-bg); border-color:var(--accent); color:var(--accent); }
+
+/* Viewer */
+.qa-right { display:flex; flex-direction:column; min-height:0; }
+.viewer-wrap {
+  background:var(--card); border:1px solid var(--border);
+  border-radius:6px; overflow:hidden; flex:1;
+  display:flex; flex-direction:column; min-height:0;
+}
+.viewer-top {
+  display:flex; align-items:center; justify-content:space-between;
+  padding:0.8rem 1.2rem; border-bottom:1px solid var(--border); flex-shrink:0;
+  background:rgba(0,200,255,0.03);
+}
+body.day .viewer-top { background:rgba(0,100,200,0.03); }
+.viewer-top-left { display:flex; align-items:center; gap:0.8rem; }
+.viewer-file-icon { font-size:1.5rem; }
+.viewer-file-name { font-family:Arial,sans-serif; font-size:15px; font-weight:700; color:var(--text); }
+.viewer-file-meta { font-family:Arial,sans-serif; font-size:12px; color:var(--muted); }
+.viewer-actions { display:flex; gap:0.5rem; }
+.v-act-btn {
+  background:transparent; border:1px solid var(--border); color:var(--muted);
+  font-family:Arial,sans-serif; font-weight:700; font-size:12px;
+  padding:5px 14px; cursor:pointer; transition:all 0.25s; border-radius:3px;
+}
+.v-act-btn.primary { border-color:var(--accent); color:var(--accent); }
+.v-act-btn.primary:hover { background:var(--btn-bg); }
+.v-act-btn:hover { border-color:var(--muted); }
+#viewer-iframe { flex:1; border:none; background:#fff; min-height:0; }
+#viewer-txt {
+  flex:1; padding:1.4rem; font-family:Arial,sans-serif; font-size:13px;
+  color:var(--text); line-height:1.85; overflow-y:auto;
+  white-space:pre-wrap; scrollbar-width:thin; scrollbar-color:var(--accent) transparent;
+  background:var(--viewer-bg);
+}
+#viewer-placeholder {
+  flex:1; display:flex; flex-direction:column; align-items:center;
+  justify-content:center; gap:0.8rem; color:var(--muted);
+}
+#viewer-placeholder .ph-icon { font-size:3rem; opacity:0.3; }
+#viewer-placeholder p { font-family:Arial,sans-serif; font-size:13px; text-align:center; line-height:1.75; max-width:330px; }
+
+/* ══════════════════════════════════════════════════
+   SCROLLBARS
+══════════════════════════════════════════════════ */
+::-webkit-scrollbar { width:5px; height:5px; }
+::-webkit-scrollbar-track { background:var(--deep); }
+::-webkit-scrollbar-thumb { background:rgba(0,200,255,0.25); border-radius:3px; }
+body.day ::-webkit-scrollbar-track { background:var(--deep); }
+body.day ::-webkit-scrollbar-thumb { background:rgba(0,100,200,0.2); }
+</style>
+</head>
+<body>
+
+<!-- ════════════════ TOPBAR ════════════════ -->
+<div class="topbar">
+  <div class="topbar-left">
+    <div class="logo-badge">AS-9100</div>
+    <h1>TRAINING <span>PORTAL</span></h1>
+  </div>
+  <div class="nav-right">
+    <div class="nav-tabs">
+      <button class="nav-tab active" onclick="showSection('clauses',this)">⬡ CLAUSES</button>
+      <button class="nav-tab" onclick="showSection('mindmap',this)">⬡ MIND MAP</button>
+      <button class="nav-tab" onclick="showSection('qa',this)">⬡ Q &amp; A DOCS</button>
+    </div>
+    <button class="theme-toggle" id="themeBtn" onclick="toggleTheme()" title="Toggle Day/Night">🌙</button>
+  </div>
+</div>
+
+<div class="main-area">
+
+<!-- ══════════════ CLAUSES ══════════════ -->
+<div id="sec-clauses" class="section active">
+  <div class="hero">
+    <div class="hero-sub">Aerospace Quality Management System · Rev D</div>
+    <h2>Understanding <span>AS-9100</span></h2>
+    <p class="hero-desc">Click any clause card for a full-screen deep-dive. Your progress is tracked below.</p>
+  </div>
+  <div class="progress-track" id="progressTrack"></div>
+  <div class="clause-grid">
+    <div class="clause-card cc-gold" onclick="openClause(1)">
+      <div class="clause-number">01</div>
+      <div class="clause-badge">CLAUSE 1</div>
+      <div class="clause-title">Scope</div>
+      <div class="card-brief">Where AS9100 applies — aerospace design, development, production, installation and service.</div>
+      <div class="card-hint">CLICK TO EXPAND ▸</div>
+    </div>
+    <div class="clause-card" onclick="openClause(2)">
+      <div class="clause-number">02</div>
+      <div class="clause-badge">CLAUSE 2</div>
+      <div class="clause-title">Normative References</div>
+      <div class="card-brief">ISO 9001 as the foundational base. AS9100 supplements, not replaces.</div>
+      <div class="card-hint">CLICK TO EXPAND ▸</div>
+    </div>
+    <div class="clause-card cc-gold" onclick="openClause(3)">
+      <div class="clause-number">03</div>
+      <div class="clause-badge">CLAUSE 3</div>
+      <div class="clause-title">Terms &amp; Definitions</div>
+      <div class="card-brief">Critical aerospace terminology — counterfeit parts, critical items, key characteristics, product safety.</div>
+      <div class="card-hint">CLICK TO EXPAND ▸</div>
+    </div>
+    <div class="clause-card" onclick="openClause(4)">
+      <div class="clause-number">04</div>
+      <div class="clause-badge">CLAUSE 4</div>
+      <div class="clause-title">Context of Organization</div>
+      <div class="card-brief">Foundation of the QMS — internal/external context, interested parties, scope, process approach.</div>
+      <div class="card-hint">CLICK TO EXPAND ▸</div>
+    </div>
+    <div class="clause-card cc-green" onclick="openClause(5)">
+      <div class="clause-number">05</div>
+      <div class="clause-badge">CLAUSE 5</div>
+      <div class="clause-title">Leadership</div>
+      <div class="card-brief">Top management actively drives, supports and owns the QMS. Customer focus. Quality policy.</div>
+      <div class="card-hint">CLICK TO EXPAND ▸</div>
+    </div>
+    <div class="clause-card" onclick="openClause(6)">
+      <div class="clause-number">06</div>
+      <div class="clause-badge">CLAUSE 6</div>
+      <div class="clause-title">Planning</div>
+      <div class="card-brief">Proactive QMS planning — risk management, measurable quality objectives, controlled change.</div>
+      <div class="card-hint">CLICK TO EXPAND ▸</div>
+    </div>
+    <div class="clause-card cc-green" onclick="openClause(7)">
+      <div class="clause-number">07</div>
+      <div class="clause-badge">CLAUSE 7</div>
+      <div class="clause-title">Support</div>
+      <div class="card-brief">Enabling infrastructure — competent people, equipment, environment, documented information.</div>
+      <div class="card-hint">CLICK TO EXPAND ▸</div>
+    </div>
+    <div class="clause-card cc-red" onclick="openClause(8)">
+      <div class="clause-number">08</div>
+      <div class="clause-badge">CLAUSE 8</div>
+      <div class="clause-title">Operations</div>
+      <div class="card-brief">Heart of the QMS — full operational lifecycle from customer requirements through release and nonconformity.</div>
+      <div class="card-hint">CLICK TO EXPAND ▸</div>
+    </div>
+    <div class="clause-card" onclick="openClause(9)">
+      <div class="clause-number">09</div>
+      <div class="clause-badge">CLAUSE 9</div>
+      <div class="clause-title">Performance Evaluation</div>
+      <div class="card-brief">Measuring whether the QMS works — audits, monitoring, measurement, management review.</div>
+      <div class="card-hint">CLICK TO EXPAND ▸</div>
+    </div>
+    <div class="clause-card cc-green" onclick="openClause(10)">
+      <div class="clause-number">10</div>
+      <div class="clause-badge">CLAUSE 10</div>
+      <div class="clause-title">Improvement</div>
+      <div class="card-brief">Continuous adaptation — corrective actions, prevent recurrence, enhance processes, drive improvement.</div>
+      <div class="card-hint">CLICK TO EXPAND ▸</div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════ MIND MAP ══════════════ -->
+<div id="sec-mindmap" class="section">
+  <div class="hero">
+    <div class="hero-sub">Structured Learning Flow</div>
+    <h2>AS-9100 <span>Mind Map</span></h2>
+    <p class="hero-desc">Click any node for a full-screen detail view. Follow the training flow from foundation to continual improvement.</p>
+  </div>
+  <div style="flex:1;overflow-y:auto;padding-bottom:1rem;">
+  <div class="mm-canvas">
+
+    <div class="mm-phase">
+      <div class="mm-phase-label">▸ Phase 1 — Understand the Standard</div>
+      <div class="mm-row">
+        <div class="mm-node gold-l" onclick="openClause(1)"><div class="mm-node-num">1</div><div class="mm-node-tag">Scope</div><div class="mm-node-title">Scope &amp; Applicability</div><ul class="mm-node-pts"><li>Aerospace sector organizations</li><li>Builds on ISO 9001</li><li>All suppliers &amp; subcontractors</li><li>Justified exclusions only</li></ul></div>
+        <div class="mm-node gold-l" onclick="openClause(2)"><div class="mm-node-num">2</div><div class="mm-node-tag">References</div><div class="mm-node-title">Normative References</div><ul class="mm-node-pts"><li>ISO 9001 is the base</li><li>AS9100 supplements ISO 9001</li><li>Monitor standard revisions</li></ul></div>
+        <div class="mm-node gold-l" onclick="openClause(3)"><div class="mm-node-num">3</div><div class="mm-node-tag">Language</div><div class="mm-node-title">Terms &amp; Definitions</div><ul class="mm-node-pts"><li>Counterfeit Part</li><li>Critical Items</li><li>Key Characteristic</li><li>Product Safety</li><li>Special Requirements</li></ul></div>
+      </div>
+    </div>
+    <div class="mm-connector">▼ ▼ ▼</div>
+
+    <div class="mm-phase">
+      <div class="mm-phase-label">▸ Phase 2 — Establish the Framework</div>
+      <div class="mm-row">
+        <div class="mm-node gold-l" onclick="openClause(4)"><div class="mm-node-num">4</div><div class="mm-node-tag">Context</div><div class="mm-node-title">Context of Organization</div><ul class="mm-node-pts"><li>SWOT + PESTEL Analysis</li><li>Internal &amp; External issues</li><li>Interested parties</li><li>QMS Scope &amp; Processes</li></ul></div>
+        <div class="mm-node green-l" onclick="openClause(5)"><div class="mm-node-num">5</div><div class="mm-node-tag">Leadership</div><div class="mm-node-title">Leadership &amp; Commitment</div><ul class="mm-node-pts"><li>Top management owns QMS</li><li>Customer focus mandate</li><li>Quality Policy establishment</li><li>Roles &amp; responsibilities</li></ul></div>
+        <div class="mm-node accent-l" onclick="openClause(6)"><div class="mm-node-num">6</div><div class="mm-node-tag">Planning</div><div class="mm-node-title">Risk-Based Planning</div><ul class="mm-node-pts"><li>Identify risks &amp; opportunities</li><li>Measurable quality objectives</li><li>Controlled change management</li></ul></div>
+      </div>
+    </div>
+    <div class="mm-connector">▼ ▼ ▼</div>
+
+    <div class="mm-phase">
+      <div class="mm-phase-label">▸ Phase 3 — Build Capability</div>
+      <div class="mm-row">
+        <div class="mm-node green-l" onclick="openClause(7)" style="flex:1;">
+          <div class="mm-node-num">7</div><div class="mm-node-tag">Support</div><div class="mm-node-title">Support Infrastructure</div>
+          <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:0.5rem;margin-top:0.5rem;">
+            <div style="background:rgba(0,232,162,0.05);border:1px solid rgba(0,232,162,0.18);padding:0.45rem;border-radius:4px;font-family:Arial,sans-serif;font-size:12px;color:var(--text2);">👥 Competent Personnel</div>
+            <div style="background:rgba(0,232,162,0.05);border:1px solid rgba(0,232,162,0.18);padding:0.45rem;border-radius:4px;font-family:Arial,sans-serif;font-size:12px;color:var(--text2);">🏭 Infrastructure &amp; Environment</div>
+            <div style="background:rgba(0,232,162,0.05);border:1px solid rgba(0,232,162,0.18);padding:0.45rem;border-radius:4px;font-family:Arial,sans-serif;font-size:12px;color:var(--text2);">📢 Communication</div>
+            <div style="background:rgba(0,232,162,0.05);border:1px solid rgba(0,232,162,0.18);padding:0.45rem;border-radius:4px;font-family:Arial,sans-serif;font-size:12px;color:var(--text2);">📂 Documented Information</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="mm-connector">▼ ▼ ▼</div>
+
+    <div class="mm-phase">
+      <div class="mm-phase-label red-lbl">▸ Phase 4 — Execute Operations (The Heart)</div>
+      <div class="mm-row">
+        <div class="mm-node red-l" onclick="openClause(8)" style="flex:1;">
+          <div class="mm-node-num">8</div><div class="mm-node-tag">Operations</div><div class="mm-node-title">Full Operational Lifecycle</div>
+          <div class="mm-ops-grid">
+            <div class="mm-ops-cell"><div class="mm-ops-cell-tag">8.1–8.2</div><div class="mm-ops-cell-txt">Planning &amp; Customer Requirements</div></div>
+            <div class="mm-ops-cell"><div class="mm-ops-cell-tag">8.3</div><div class="mm-ops-cell-txt">Design &amp; Development</div></div>
+            <div class="mm-ops-cell"><div class="mm-ops-cell-tag">8.4</div><div class="mm-ops-cell-txt">External Provider Control</div></div>
+            <div class="mm-ops-cell"><div class="mm-ops-cell-tag">8.5</div><div class="mm-ops-cell-txt">Production &amp; Service</div></div>
+            <div class="mm-ops-cell"><div class="mm-ops-cell-tag">8.6</div><div class="mm-ops-cell-txt">Release of Products</div></div>
+            <div class="mm-ops-cell"><div class="mm-ops-cell-tag">8.7</div><div class="mm-ops-cell-txt">Nonconforming Outputs</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="mm-connector">▼ ▼ ▼</div>
+
+    <div class="mm-phase">
+      <div class="mm-phase-label">▸ Phase 5 — Evaluate &amp; Improve</div>
+      <div class="mm-row">
+        <div class="mm-node accent-l" onclick="openClause(9)"><div class="mm-node-num">9</div><div class="mm-node-tag">Evaluate</div><div class="mm-node-title">Performance Evaluation</div><ul class="mm-node-pts"><li>Monitor &amp; measure processes</li><li>Internal audit program</li><li>Management review</li><li>Data-driven decisions</li></ul></div>
+        <div class="mm-node green-l" onclick="openClause(10)"><div class="mm-node-num">10</div><div class="mm-node-tag">Improve</div><div class="mm-node-title">Continual Improvement</div><ul class="mm-node-pts"><li>Corrective actions</li><li>Nonconformity handling</li><li>Prevent recurrence</li><li>Enhance &amp; adapt QMS</li></ul></div>
+      </div>
+    </div>
+
+    <div class="mm-cycle">
+      <span>↺ &nbsp; IMPROVEMENT → FEEDS BACK INTO → CONTEXT (Cl.4) → PLANNING (Cl.6) → OPERATIONS (Cl.8) &nbsp; ↺</span>
+    </div>
+    <div class="mm-legend">
+      <div class="mm-li"><div class="mm-dot" style="background:var(--gold)"></div>Foundation (1–3)</div>
+      <div class="mm-li"><div class="mm-dot" style="background:var(--green)"></div>Establish / Enable (4–7)</div>
+      <div class="mm-li"><div class="mm-dot" style="background:var(--red)"></div>Operations Core (8)</div>
+      <div class="mm-li"><div class="mm-dot" style="background:var(--accent)"></div>Evaluate &amp; Improve (9–10)</div>
+      <div class="mm-li" style="color:var(--accent);">💡 Click any node → full-screen detail</div>
+    </div>
+  </div>
+  </div>
+</div>
+
+<!-- ══════════════ Q&A DOCS ══════════════ -->
+<div id="sec-qa" class="section">
+  <div class="hero" style="padding-bottom:0.5rem;flex-shrink:0;">
+    <div class="hero-sub">Assessment &amp; Reference Materials</div>
+    <h2>Q &amp; A <span>Documents</span></h2>
+    <p class="hero-desc">Upload PDF or Word documents. Tag each file to a clause. Click VIEW to open it directly in the portal.</p>
+  </div>
+
+  <div class="qa-layout" style="margin-top:0.8rem;">
+    <!-- LEFT -->
+    <div class="qa-left">
+      <div class="upload-zone" id="dropZone" ondragover="dragOver(event)" ondragleave="dragLeave(event)" ondrop="dropFile(event)">
+        <div class="upload-icon">📎</div>
+        <h3>DROP FILES HERE</h3>
+        <p>PDF, Word (.docx / .doc), or plain text (.txt)<br>Drag &amp; drop, or click to browse</p>
+        <button class="upload-btn" onclick="document.getElementById('fileInput').click()">BROWSE FILES</button>
+        <input type="file" id="fileInput" accept=".pdf,.doc,.docx,.txt" multiple onchange="handleFiles(this.files)">
+      </div>
+
+      <!-- Filter -->
+      <div class="cf-section">
+        <div class="panel-title">Filter by Clause</div>
+        <div class="cf-row" id="clauseFilter">
+          <button class="cf-btn active" onclick="filterClause('all',this)">ALL</button>
+          <button class="cf-btn" onclick="filterClause('1',this)">CL.1</button>
+          <button class="cf-btn" onclick="filterClause('2',this)">CL.2</button>
+          <button class="cf-btn" onclick="filterClause('3',this)">CL.3</button>
+          <button class="cf-btn" onclick="filterClause('4',this)">CL.4</button>
+          <button class="cf-btn" onclick="filterClause('5',this)">CL.5</button>
+          <button class="cf-btn" onclick="filterClause('6',this)">CL.6</button>
+          <button class="cf-btn" onclick="filterClause('7',this)">CL.7</button>
+          <button class="cf-btn" onclick="filterClause('8',this)">CL.8</button>
+          <button class="cf-btn" onclick="filterClause('9',this)">CL.9</button>
+          <button class="cf-btn" onclick="filterClause('10',this)">CL.10</button>
+        </div>
+      </div>
+
+      <!-- File list -->
+      <div class="file-list-panel">
+        <div class="panel-title">📁 Uploaded Documents</div>
+        <div id="fileListContainer">
+          <div class="empty-msg">No documents uploaded yet.<br>Upload clause-wise Q&amp;A documents above.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- RIGHT — VIEWER -->
+    <div class="qa-right">
+      <div class="viewer-wrap">
+        <div class="viewer-top">
+          <div class="viewer-top-left">
+            <div class="viewer-file-icon" id="vFileIcon">📄</div>
+            <div>
+              <div class="viewer-file-name" id="vFileName">Document Viewer</div>
+              <div class="viewer-file-meta" id="vFileMeta">Select a document from the list</div>
+            </div>
+          </div>
+          <div class="viewer-actions">
+            <button class="v-act-btn primary" id="btnOpenExternal" onclick="openExternal()" style="display:none;">⬡ Open in Browser</button>
+            <button class="v-act-btn" id="btnDownload" onclick="downloadFile()" style="display:none;">⬇ Download</button>
+          </div>
+        </div>
+        <div id="viewer-placeholder">
+          <div class="ph-icon">📂</div>
+          <p>Select a document from the left to view it here.<br><br>
+          <span style="font-family:Arial,sans-serif;font-size:12px;color:var(--accent);">
+          TXT → rendered inline &nbsp;|&nbsp; PDF → embedded viewer<br>
+          Word → Open in Browser or Download
+          </span></p>
+        </div>
+        <iframe id="viewer-iframe" style="display:none;" title="Document Viewer"></iframe>
+        <div id="viewer-txt" style="display:none;"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+</div><!-- /main-area -->
+
+<!-- ══════════════ FULLSCREEN OVERLAY ══════════════ -->
+<div class="overlay-backdrop" id="overlayBackdrop" onclick="closeOverlayIfBg(event)">
+  <div class="overlay-panel" id="overlayPanel">
+
+    <!-- FIXED HEADER -->
+    <div class="overlay-header">
+      <div class="overlay-header-left">
+        <div class="overlay-big-num" id="ovNum">01</div>
+        <div>
+          <div class="ov-badge" id="ovBadge">CLAUSE 1</div>
+          <div class="ov-heading" id="ovTitle">Scope</div>
+          <div class="ov-esc-hint">Press ESC or click outside to close</div>
+        </div>
+      </div>
+      <button class="overlay-close" onclick="closeOverlay()">✕</button>
+    </div>
+
+    <!-- BODY: LEFT text pane + RIGHT diagram pane -->
+    <div class="overlay-body">
+      <div class="ov-left"  id="ovLeft"></div>
+      <div class="ov-right" id="ovRight"></div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+// ══════════════════════════════════════════════════
+//  THEME TOGGLE
+// ══════════════════════════════════════════════════
+let isDayMode = false;
+function toggleTheme() {
+  isDayMode = !isDayMode;
+  document.body.classList.toggle('day', isDayMode);
+  document.getElementById('themeBtn').textContent = isDayMode ? '🌙' : '☀️';
+  document.getElementById('themeBtn').title = isDayMode ? 'Switch to Night Mode' : 'Switch to Day Mode';
+}
+
+// ══════════════════════════════════════════════════
+//  CLAUSE DATA
+// ══════════════════════════════════════════════════
+const CLAUSES = {
+  1:{title:"Scope",badge:"CLAUSE 1",color:"gold",num:"01",blocks:[
+    {title:"WHAT IS AS9100",full:true,type:"p",content:"AS9100 is the Quality Management System standard for the aerospace industry. It specifies requirements for organizations that design, develop, produce, install, and service aerospace products and services. It is built upon ISO 9001 and adds aerospace-specific requirements on top."},
+    {title:"WHO IT APPLIES TO",type:"ul",items:["All aerospace organizations — manufacturers, MROs, service providers","Suppliers and subcontractors in the aerospace supply chain","Organizations seeking regulatory and customer approval","Any organization wanting to demonstrate aerospace QMS capability"]},
+    {title:"EXCLUSIONS POLICY",type:"ul",items:["Exclusions are permitted only if they do not affect product safety","Exclusions must be justified and documented","Cannot exclude anything that impacts product conformity","Customer must be notified of any applicable exclusions"]},
+    {title:"PURPOSE",type:"ul",items:["Ensure consistent quality across the aerospace supply chain","Meet customer, statutory, and regulatory requirements","Provide framework for continual quality improvement","Demonstrate capability to deliver safe, conforming aerospace products"]},
+    {title:"AS9100 RELATIONSHIP TO ISO 9001 — STRUCTURE DIAGRAM",type:"diagram",svg:`
+<svg viewBox="0 0 820 200" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="g1a" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#f5b000" stop-opacity="0.25"/>
+      <stop offset="100%" stop-color="#f5b000" stop-opacity="0.08"/>
+    </linearGradient>
+    <linearGradient id="g1b" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#00c8ff" stop-opacity="0.22"/>
+      <stop offset="100%" stop-color="#00c8ff" stop-opacity="0.07"/>
+    </linearGradient>
+  </defs>
+  <!-- ISO 9001 base layer -->
+  <rect x="10" y="100" width="800" height="85" rx="8" fill="url(#g1a)" stroke="#f5b000" stroke-width="1.5"/>
+  <text x="410" y="148" text-anchor="middle" class="svg-label" font-size="15" font-weight="700" fill="#f5b000">ISO 9001 — Quality Management System Foundation</text>
+  <text x="410" y="168" text-anchor="middle" class="svg-label" font-size="12" fill="#c0a060">Clauses 4–10 · Risk-Based Thinking · Process Approach · Customer Focus</text>
+  <!-- AS9100 layer -->
+  <rect x="100" y="14" width="620" height="78" rx="8" fill="url(#g1b)" stroke="#00c8ff" stroke-width="2"/>
+  <text x="410" y="48" text-anchor="middle" class="svg-label" font-size="15" font-weight="700" fill="#00c8ff">AS9100 Rev D — Aerospace-Specific Additions</text>
+  <text x="410" y="68" text-anchor="middle" class="svg-label" font-size="12" fill="#7ac8e8">Counterfeit Parts · Critical Items · FOD · FAI · Product Safety · Key Characteristics</text>
+  <!-- Arrow -->
+  <line x1="410" y1="92" x2="410" y2="100" stroke="#aaa" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <text x="415" y="99" class="svg-label" font-size="11" fill="#888">Built on top of</text>
+  <!-- Labels left/right -->
+  <text x="18" y="95" class="svg-label" font-size="11" font-weight="700" fill="#f5b000">ISO 9001</text>
+  <text x="18" y="50" class="svg-label" font-size="11" font-weight="700" fill="#00c8ff">AS9100</text>
+  <!-- Supply chain boxes -->
+  <rect x="130" y="130" width="100" height="34" rx="4" fill="rgba(255,255,255,0.05)" stroke="rgba(245,176,0,0.4)" stroke-width="1"/>
+  <text x="180" y="148" text-anchor="middle" class="svg-label" font-size="11" fill="#f5b000">OEM</text>
+  <text x="180" y="160" text-anchor="middle" class="svg-label" font-size="10" fill="#888">Manufacturer</text>
+  <rect x="270" y="130" width="100" height="34" rx="4" fill="rgba(255,255,255,0.05)" stroke="rgba(245,176,0,0.4)" stroke-width="1"/>
+  <text x="320" y="148" text-anchor="middle" class="svg-label" font-size="11" fill="#f5b000">Tier 1</text>
+  <text x="320" y="160" text-anchor="middle" class="svg-label" font-size="10" fill="#888">Supplier</text>
+  <rect x="410" y="130" width="100" height="34" rx="4" fill="rgba(255,255,255,0.05)" stroke="rgba(245,176,0,0.4)" stroke-width="1"/>
+  <text x="460" y="148" text-anchor="middle" class="svg-label" font-size="11" fill="#f5b000">Tier 2</text>
+  <text x="460" y="160" text-anchor="middle" class="svg-label" font-size="10" fill="#888">Sub-Supplier</text>
+  <rect x="550" y="130" width="100" height="34" rx="4" fill="rgba(255,255,255,0.05)" stroke="rgba(245,176,0,0.4)" stroke-width="1"/>
+  <text x="600" y="148" text-anchor="middle" class="svg-label" font-size="11" fill="#f5b000">MRO</text>
+  <text x="600" y="160" text-anchor="middle" class="svg-label" font-size="10" fill="#888">Services</text>
+  <line x1="230" y1="147" x2="270" y2="147" stroke="#f5b000" stroke-width="1" stroke-dasharray="3,2"/>
+  <line x1="370" y1="147" x2="410" y2="147" stroke="#f5b000" stroke-width="1" stroke-dasharray="3,2"/>
+  <line x1="510" y1="147" x2="550" y2="147" stroke="#f5b000" stroke-width="1" stroke-dasharray="3,2"/>
+</svg>`},
+    {title:"KEY TAGS",type:"tags",items:["ISO 9001 Base","Aerospace Specific","Suppliers Included","Safety Critical","Documented Exclusions"]}
+  ]},
+  2:{title:"Normative References",badge:"CLAUSE 2",color:"",num:"02",blocks:[
+    {title:"OVERVIEW",full:true,type:"p",content:"Clause 2 identifies the documents that must be referenced for the application of AS9100. The primary normative reference is ISO 9001. AS9100 does not replace ISO 9001 — it supplements it with additional aerospace-specific requirements on top of the full ISO 9001 framework."},
+    {title:"PRIMARY REFERENCE",type:"ul",items:["ISO 9001 — Quality Management Systems Requirements","Forms the base structure and all base requirements","All ISO 9001 clauses are fully inherited by AS9100","AS9100 adds aerospace requirements on top of each ISO 9001 clause"]},
+    {title:"COMPLIANCE IMPLICATIONS",type:"ul",items:["Full ISO 9001 compliance is a prerequisite for AS9100","Any revision to ISO 9001 must be evaluated for AS9100 impact","Organizations must track and respond to updates in referenced standards","Internal quality systems must align with both standards simultaneously"]},
+    {title:"AUDITOR NOTE",type:"p",content:"During an AS9100 audit, auditors verify compliance against both ISO 9001 base requirements AND the additional AS9100 aerospace-specific clauses. Gaps in either will result in audit findings — nonconformities or observations."},
+    {title:"KEY TAGS",type:"tags",items:["ISO 9001","Supplement","Not Replacement","Monitor Revisions","Dual Compliance"]},
+    {title:"AS9100 STANDARDS HIERARCHY",type:"diagram",svg:`<svg viewBox="0 0 820 180" xmlns="http://www.w3.org/2000/svg">
+  <rect x="260" y="8" width="300" height="42" rx="6" fill="rgba(0,200,255,0.18)" stroke="#00c8ff" stroke-width="2"/>
+  <text x="410" y="33" text-anchor="middle" font-family="Arial" font-size="14" font-weight="700" fill="#00c8ff">AS9100 Rev D</text>
+  <text x="410" y="44" text-anchor="middle" font-family="Arial" font-size="11" fill="#80c8e8">Aerospace-Specific QMS</text>
+  <line x1="410" y1="50" x2="410" y2="68" stroke="#888" stroke-width="1.5"/>
+  <polygon points="406,68 414,68 410,76" fill="#888"/>
+  <rect x="210" y="76" width="400" height="42" rx="6" fill="rgba(245,176,0,0.15)" stroke="#f5b000" stroke-width="2"/>
+  <text x="410" y="101" text-anchor="middle" font-family="Arial" font-size="14" font-weight="700" fill="#f5b000">ISO 9001:2015</text>
+  <text x="410" y="112" text-anchor="middle" font-family="Arial" font-size="11" fill="#c0a060">Quality Management System — Base Standard</text>
+  <line x1="410" y1="118" x2="410" y2="136" stroke="#888" stroke-width="1.5"/>
+  <polygon points="406,136 414,136 410,144" fill="#888"/>
+  <rect x="60" y="144" width="680" height="30" rx="5" fill="rgba(0,232,162,0.12)" stroke="#00e8a2" stroke-width="1.5"/>
+  <text x="400" y="163" text-anchor="middle" font-family="Arial" font-size="12" font-weight="700" fill="#00e8a2">Customer &amp; Regulatory Requirements (DGCA / FAA / EASA / NADCAP)</text>
+</svg>`}
+  ]},
+  3:{title:"Terms & Definitions",badge:"CLAUSE 3",color:"gold",num:"03",blocks:[
+    {title:"COUNTERFEIT PART",type:"ul",items:["An unauthorized copy, imitation, substitute, or modified part","Knowingly misrepresented as a genuine part of an original or authorized manufacturer","Includes false marking, labelling, grade, serial number, date code","Includes false documentation or performance characteristics","High risk in aerospace supply chains — can cause catastrophic mission failures"]},
+    {title:"CRITICAL ITEMS",type:"ul",items:["Items with significant effect on safety, performance, form, fit, function, producibility, service life","Require specific actions to ensure they are adequately managed","Examples: safety critical items, fracture critical items, mission critical items","Include key characteristics that need variation control","Must be identified and tracked through the entire production lifecycle"]},
+    {title:"KEY CHARACTERISTIC",type:"ul",items:["An attribute or feature whose variation significantly affects product fitness, form, function, performance","Variation in Key Characteristics requires specific control actions","Must be identified during design and development phases","Controlled through special process controls and inspection plans","Often flowed-down to suppliers as specific contractual requirements"]},
+    {title:"PRODUCT SAFETY",type:"ul",items:["The state in which a product performs its designed purpose","Without causing unacceptable risk of harm to people","Without causing unacceptable damage to property","Product safety considerations must be embedded in design, production, and service processes"]},
+    {title:"SPECIAL REQUIREMENTS",type:"ul",items:["Requirements with high risk of not being achieved","Must be included in the operational risk management process","Factors: product/process complexity, experience, maturity","Examples: performance at the limit of industry capability","Requirements at the limit of the organization's technical or process capabilities"]},
+    {title:"KEY TAGS",type:"tags",items:["Counterfeit Part","Critical Items","Key Characteristic","Product Safety","Special Requirements","Risk Management"]},
+    {title:"KEY TERMS AT A GLANCE — VISUAL REFERENCE",type:"diagram",svg:`<svg viewBox="0 0 820 200" xmlns="http://www.w3.org/2000/svg">
+  <!-- 5 term boxes -->
+  <rect x="10"  y="20" width="148" height="160" rx="6" fill="rgba(255,64,96,0.10)"   stroke="#ff4060" stroke-width="1.5"/>
+  <rect x="168" y="20" width="148" height="160" rx="6" fill="rgba(245,176,0,0.12)"   stroke="#f5b000" stroke-width="1.5"/>
+  <rect x="326" y="20" width="148" height="160" rx="6" fill="rgba(0,200,255,0.12)"   stroke="#00c8ff" stroke-width="1.5"/>
+  <rect x="484" y="20" width="148" height="160" rx="6" fill="rgba(0,232,162,0.10)"   stroke="#00e8a2" stroke-width="1.5"/>
+  <rect x="642" y="20" width="168" height="160" rx="6" fill="rgba(180,100,255,0.10)" stroke="#b46eff" stroke-width="1.5"/>
+  <!-- Titles -->
+  <text x="84"  y="46" text-anchor="middle" font-family="Arial" font-size="12" font-weight="700" fill="#ff4060">Counterfeit</text>
+  <text x="84"  y="60" text-anchor="middle" font-family="Arial" font-size="12" font-weight="700" fill="#ff4060">Part</text>
+  <text x="242" y="46" text-anchor="middle" font-family="Arial" font-size="12" font-weight="700" fill="#f5b000">Critical</text>
+  <text x="242" y="60" text-anchor="middle" font-family="Arial" font-size="12" font-weight="700" fill="#f5b000">Items</text>
+  <text x="400" y="46" text-anchor="middle" font-family="Arial" font-size="12" font-weight="700" fill="#00c8ff">Key</text>
+  <text x="400" y="60" text-anchor="middle" font-family="Arial" font-size="12" font-weight="700" fill="#00c8ff">Characteristic</text>
+  <text x="558" y="46" text-anchor="middle" font-family="Arial" font-size="12" font-weight="700" fill="#00e8a2">Product</text>
+  <text x="558" y="60" text-anchor="middle" font-family="Arial" font-size="12" font-weight="700" fill="#00e8a2">Safety</text>
+  <text x="726" y="46" text-anchor="middle" font-family="Arial" font-size="12" font-weight="700" fill="#b46eff">Special</text>
+  <text x="726" y="60" text-anchor="middle" font-family="Arial" font-size="12" font-weight="700" fill="#b46eff">Requirements</text>
+  <!-- Icons -->
+  <text x="84"  y="100" text-anchor="middle" font-family="Arial" font-size="28">🔴</text>
+  <text x="242" y="100" text-anchor="middle" font-family="Arial" font-size="28">⚠️</text>
+  <text x="400" y="100" text-anchor="middle" font-family="Arial" font-size="28">🔑</text>
+  <text x="558" y="100" text-anchor="middle" font-family="Arial" font-size="28">🛡️</text>
+  <text x="726" y="100" text-anchor="middle" font-family="Arial" font-size="28">📋</text>
+  <!-- Descriptions -->
+  <text x="84"  y="122" text-anchor="middle" font-family="Arial" font-size="10" fill="#ccc">Unauthorized</text>
+  <text x="84"  y="134" text-anchor="middle" font-family="Arial" font-size="10" fill="#ccc">fake part</text>
+  <text x="84"  y="146" text-anchor="middle" font-family="Arial" font-size="10" fill="#ccc">misrepresented</text>
+  <text x="242" y="122" text-anchor="middle" font-family="Arial" font-size="10" fill="#ccc">Safety/fracture/</text>
+  <text x="242" y="134" text-anchor="middle" font-family="Arial" font-size="10" fill="#ccc">mission critical</text>
+  <text x="242" y="146" text-anchor="middle" font-family="Arial" font-size="10" fill="#ccc">tracked lifecycle</text>
+  <text x="400" y="122" text-anchor="middle" font-family="Arial" font-size="10" fill="#ccc">Feature whose</text>
+  <text x="400" y="134" text-anchor="middle" font-family="Arial" font-size="10" fill="#ccc">variation affects</text>
+  <text x="400" y="146" text-anchor="middle" font-family="Arial" font-size="10" fill="#ccc">form/fit/function</text>
+  <text x="558" y="122" text-anchor="middle" font-family="Arial" font-size="10" fill="#ccc">No unacceptable</text>
+  <text x="558" y="134" text-anchor="middle" font-family="Arial" font-size="10" fill="#ccc">risk of harm to</text>
+  <text x="558" y="146" text-anchor="middle" font-family="Arial" font-size="10" fill="#ccc">people/property</text>
+  <text x="726" y="122" text-anchor="middle" font-family="Arial" font-size="10" fill="#ccc">High risk of not</text>
+  <text x="726" y="134" text-anchor="middle" font-family="Arial" font-size="10" fill="#ccc">being met — needs</text>
+  <text x="726" y="146" text-anchor="middle" font-family="Arial" font-size="10" fill="#ccc">risk management</text>
+  <text x="84"  y="170" text-anchor="middle" font-family="Arial" font-size="10" font-weight="700" fill="#ff4060">ZERO TOLERANCE</text>
+  <text x="242" y="170" text-anchor="middle" font-family="Arial" font-size="10" font-weight="700" fill="#f5b000">SPECIFIC CONTROL</text>
+  <text x="400" y="170" text-anchor="middle" font-family="Arial" font-size="10" font-weight="700" fill="#00c8ff">FLOW-DOWN</text>
+  <text x="558" y="170" text-anchor="middle" font-family="Arial" font-size="10" font-weight="700" fill="#00e8a2">EMBEDDED IN ALL</text>
+  <text x="726" y="170" text-anchor="middle" font-family="Arial" font-size="10" font-weight="700" fill="#b46eff">RISK PROCESS</text>
+</svg>`}
+  ]},
+  4:{title:"Context of Organization",badge:"CLAUSE 4",color:"",num:"04",blocks:[
+    {title:"SUB-CLAUSES",type:"ul",items:["4.1 — Understanding the organization and its context","4.2 — Understanding the needs and expectations of interested parties","4.3 — Determining the scope of the quality management system","4.4 — Quality management system and its processes"]},
+    {title:"INTERNAL & EXTERNAL CONTEXT",type:"ul",items:["Internal: culture, organizational structure, roles, capabilities, strategic direction","External: market conditions, regulatory environment, technology trends","External: political, economic, social factors (PESTEL framework)","Both must be analyzed and documented — they shape the QMS design","Context must be reviewed periodically as it changes"]},
+    {title:"INTERESTED PARTIES",type:"ul",items:["Customers and their requirements","Regulatory and certification authorities (DGCA, FAA, EASA, etc.)","Employees and their competencies","Suppliers and subcontractors","Shareholders, owners, and investors"]},
+    {title:"PROCESS-BASED APPROACH",type:"ul",items:["Organization must identify all processes needed to deliver conforming products","Process interactions must be mapped and understood","Inputs, outputs, controls, and resources for each process must be defined","Process performance must be monitored against defined objectives"]},
+    {title:"KEY TAGS",type:"tags",items:["SWOT","PESTEL","Interested Parties","QMS Scope","Process Map","Internal Context","External Context"]},
+    {title:"SWOT ANALYSIS (Internal) + PESTEL ANALYSIS (External)",type:"diagram",svg:`<svg viewBox="0 0 820 310" xmlns="http://www.w3.org/2000/svg">
+  <!-- SWOT Label -->
+  <text x="200" y="18" text-anchor="middle" font-family="Arial" font-size="13" font-weight="700" fill="#00c8ff">SWOT — Internal Context</text>
+  <!-- SWOT grid -->
+  <rect x="10"  y="26" width="185" height="120" rx="5" fill="rgba(0,232,162,0.12)" stroke="#00e8a2" stroke-width="1.5"/>
+  <rect x="205" y="26" width="185" height="120" rx="5" fill="rgba(255,64,96,0.10)"  stroke="#ff4060" stroke-width="1.5"/>
+  <rect x="10"  y="154" width="185" height="120" rx="5" fill="rgba(0,200,255,0.12)" stroke="#00c8ff" stroke-width="1.5"/>
+  <rect x="205" y="154" width="185" height="120" rx="5" fill="rgba(245,176,0,0.12)" stroke="#f5b000" stroke-width="1.5"/>
+  <text x="102" y="50"  text-anchor="middle" font-family="Arial" font-size="13" font-weight="700" fill="#00e8a2">S — STRENGTHS</text>
+  <text x="297" y="50"  text-anchor="middle" font-family="Arial" font-size="13" font-weight="700" fill="#ff4060">W — WEAKNESSES</text>
+  <text x="102" y="178" text-anchor="middle" font-family="Arial" font-size="13" font-weight="700" fill="#00c8ff">O — OPPORTUNITIES</text>
+  <text x="297" y="178" text-anchor="middle" font-family="Arial" font-size="13" font-weight="700" fill="#f5b000">T — THREATS</text>
+  <text x="102" y="72"  text-anchor="middle" font-family="Arial" font-size="11" fill="#aaa">Capabilities</text>
+  <text x="102" y="86"  text-anchor="middle" font-family="Arial" font-size="11" fill="#aaa">Certifications</text>
+  <text x="102" y="100" text-anchor="middle" font-family="Arial" font-size="11" fill="#aaa">Experienced Team</text>
+  <text x="102" y="114" text-anchor="middle" font-family="Arial" font-size="11" fill="#aaa">Technology Edge</text>
+  <text x="297" y="72"  text-anchor="middle" font-family="Arial" font-size="11" fill="#aaa">Process Gaps</text>
+  <text x="297" y="86"  text-anchor="middle" font-family="Arial" font-size="11" fill="#aaa">Skill Shortages</text>
+  <text x="297" y="100" text-anchor="middle" font-family="Arial" font-size="11" fill="#aaa">Documentation Issues</text>
+  <text x="297" y="114" text-anchor="middle" font-family="Arial" font-size="11" fill="#aaa">Resource Constraints</text>
+  <text x="102" y="200" text-anchor="middle" font-family="Arial" font-size="11" fill="#aaa">New Markets</text>
+  <text x="102" y="214" text-anchor="middle" font-family="Arial" font-size="11" fill="#aaa">Technology Adoption</text>
+  <text x="102" y="228" text-anchor="middle" font-family="Arial" font-size="11" fill="#aaa">Regulatory Support</text>
+  <text x="102" y="242" text-anchor="middle" font-family="Arial" font-size="11" fill="#aaa">Defence Contracts</text>
+  <text x="297" y="200" text-anchor="middle" font-family="Arial" font-size="11" fill="#aaa">Competition</text>
+  <text x="297" y="214" text-anchor="middle" font-family="Arial" font-size="11" fill="#aaa">Regulatory Changes</text>
+  <text x="297" y="228" text-anchor="middle" font-family="Arial" font-size="11" fill="#aaa">Supply Chain Risk</text>
+  <text x="297" y="242" text-anchor="middle" font-family="Arial" font-size="11" fill="#aaa">Counterfeit Parts</text>
+  <!-- Divider -->
+  <line x1="420" y1="0" x2="420" y2="310" stroke="rgba(255,255,255,0.1)" stroke-width="1" stroke-dasharray="4,3"/>
+  <!-- PESTEL label -->
+  <text x="620" y="18" text-anchor="middle" font-family="Arial" font-size="13" font-weight="700" fill="#f5b000">PESTEL — External Context</text>
+  <!-- PESTEL items -->
+  <rect x="430" y="26"  width="375" height="40" rx="5" fill="rgba(0,200,255,0.10)"   stroke="#00c8ff" stroke-width="1.3"/>
+  <rect x="430" y="72"  width="375" height="40" rx="5" fill="rgba(0,232,162,0.10)"   stroke="#00e8a2" stroke-width="1.3"/>
+  <rect x="430" y="118" width="375" height="40" rx="5" fill="rgba(245,176,0,0.10)"   stroke="#f5b000" stroke-width="1.3"/>
+  <rect x="430" y="164" width="375" height="40" rx="5" fill="rgba(180,100,255,0.10)" stroke="#b46eff" stroke-width="1.3"/>
+  <rect x="430" y="210" width="375" height="40" rx="5" fill="rgba(255,64,96,0.10)"   stroke="#ff4060" stroke-width="1.3"/>
+  <rect x="430" y="256" width="375" height="40" rx="5" fill="rgba(100,180,100,0.10)" stroke="#80cc80" stroke-width="1.3"/>
+  <text x="448" y="50"  font-family="Arial" font-size="13" font-weight="700" fill="#00c8ff">P</text>
+  <text x="468" y="50"  font-family="Arial" font-size="12" fill="#aaa">— Political: Govt policies, defence budgets, trade</text>
+  <text x="448" y="96"  font-family="Arial" font-size="13" font-weight="700" fill="#00e8a2">E</text>
+  <text x="468" y="96"  font-family="Arial" font-size="12" fill="#aaa">— Economic: Market conditions, inflation, forex</text>
+  <text x="448" y="142" font-family="Arial" font-size="13" font-weight="700" fill="#f5b000">S</text>
+  <text x="468" y="142" font-family="Arial" font-size="12" fill="#aaa">— Social: Workforce trends, safety culture</text>
+  <text x="448" y="188" font-family="Arial" font-size="13" font-weight="700" fill="#b46eff">T</text>
+  <text x="468" y="188" font-family="Arial" font-size="12" fill="#aaa">— Technology: Digital, automation, SDR, AI</text>
+  <text x="448" y="234" font-family="Arial" font-size="13" font-weight="700" fill="#ff4060">E</text>
+  <text x="468" y="234" font-family="Arial" font-size="12" fill="#aaa">— Environmental: Sustainability, emissions</text>
+  <text x="448" y="280" font-family="Arial" font-size="13" font-weight="700" fill="#80cc80">L</text>
+  <text x="468" y="280" font-family="Arial" font-size="12" fill="#aaa">— Legal: DGCA, FAA, EASA, ISO, AS9100 reqs</text>
+</svg>`}
+  ]},
+  5:{title:"Leadership",badge:"CLAUSE 5",color:"green",num:"05",blocks:[
+    {title:"SUB-CLAUSES",type:"ul",items:["5.1.1 — General leadership and commitment","5.1.2 — Customer focus","5.2.1 — Establishing the quality policy","5.2.2 — Communicating the quality policy","5.3 — Organizational roles, responsibilities, and authorities"]},
+    {title:"TOP MANAGEMENT OBLIGATIONS",type:"ul",items:["Integrate QMS into the organization's core business processes","Promote risk-based thinking throughout the organization","Ensure quality objectives align with strategic direction","Actively participate in management reviews","Demonstrate personal commitment — quality is NOT just the quality department's job","Provide adequate resources for the QMS to function effectively"]},
+    {title:"CUSTOMER FOCUS",type:"ul",items:["Leadership must ensure customer requirements are determined and met","Regulatory requirements must be identified and complied with","Risks to product conformity must be addressed proactively","Customer satisfaction must be measured and acted upon","Focus on enhancing customer satisfaction — not just meeting minimum requirements"]},
+    {title:"QUALITY POLICY REQUIREMENTS",type:"ul",items:["Must be appropriate to the purpose and context of the organization","Must include commitment to satisfy applicable requirements","Must include commitment to continual improvement of the QMS","Must be communicated, understood, and applied at all levels","Must be available to relevant interested parties","Must be reviewed for continuing suitability — not static"]},
+    {title:"KEY TAGS",type:"tags",items:["Top Management","Customer Focus","Quality Policy","Roles & Authorities","Risk-Based Thinking","Commitment"]},
+    {title:"LEADERSHIP COMMITMENT PYRAMID",type:"diagram",svg:`<svg viewBox="0 0 820 230" xmlns="http://www.w3.org/2000/svg">
+  <!-- Pyramid layers bottom to top -->
+  <!-- Layer 4 base -->
+  <polygon points="80,210 740,210 680,168 140,168" fill="rgba(0,200,255,0.10)" stroke="#00c8ff" stroke-width="1.5"/>
+  <text x="410" y="193" text-anchor="middle" font-family="Arial" font-size="12" font-weight="700" fill="#00c8ff">ALL EMPLOYEES — Awareness · Competence · QMS Understanding · Ethical Behaviour</text>
+  <!-- Layer 3 -->
+  <polygon points="140,168 680,168 620,126 200,126" fill="rgba(0,232,162,0.12)" stroke="#00e8a2" stroke-width="1.5"/>
+  <text x="410" y="151" text-anchor="middle" font-family="Arial" font-size="12" font-weight="700" fill="#00e8a2">PROCESS OWNERS — Define processes · Monitor KPIs · Own documentation · Drive conformity</text>
+  <!-- Layer 2 -->
+  <polygon points="200,126 620,126 560,84 260,84" fill="rgba(245,176,0,0.13)" stroke="#f5b000" stroke-width="1.5"/>
+  <text x="410" y="109" text-anchor="middle" font-family="Arial" font-size="12" font-weight="700" fill="#f5b000">QMS MANAGEMENT REPRESENTATIVE — System oversight · Internal audits · Corrective actions</text>
+  <!-- Layer 1 top -->
+  <polygon points="260,84 560,84 500,42 320,42" fill="rgba(0,232,162,0.18)" stroke="#00e8a2" stroke-width="2"/>
+  <text x="410" y="67" text-anchor="middle" font-family="Arial" font-size="12" font-weight="700" fill="#fff">TOP MANAGEMENT — Strategy · Policy · Resources · Customer Focus</text>
+  <!-- Peak -->
+  <polygon points="320,42 500,42 410,10" fill="rgba(0,232,162,0.35)" stroke="#00e8a2" stroke-width="2"/>
+  <text x="410" y="32" text-anchor="middle" font-family="Arial" font-size="11" font-weight="700" fill="#fff">CEO/MD</text>
+  <!-- Customer arrow right -->
+  <text x="762" y="95" text-anchor="middle" font-family="Arial" font-size="11" fill="#00e8a2">👥</text>
+  <text x="762" y="109" text-anchor="middle" font-family="Arial" font-size="10" fill="#00e8a2">CUSTOMER</text>
+  <line x1="740" y1="100" x2="758" y2="100" stroke="#00e8a2" stroke-width="1.5" stroke-dasharray="3,2"/>
+  <!-- Quality Policy arrow left -->
+  <text x="58" y="95" text-anchor="middle" font-family="Arial" font-size="10" fill="#f5b000">QUALITY</text>
+  <text x="58" y="107" text-anchor="middle" font-family="Arial" font-size="10" fill="#f5b000">POLICY</text>
+  <line x1="78" y1="100" x2="60" y2="100" stroke="#f5b000" stroke-width="1.5" stroke-dasharray="3,2"/>
+</svg>`}
+  ]},
+  6:{title:"Planning",badge:"CLAUSE 6",color:"",num:"06",blocks:[
+    {title:"SUB-CLAUSES",type:"ul",items:["6.1 — Actions to address risks and opportunities","6.2 — Quality objectives and planning to achieve them","6.3 — Planning of changes"]},
+    {title:"RISK-BASED THINKING",type:"ul",items:["Identify risks affecting product conformity, customer satisfaction, or QMS performance","Identify opportunities that could improve performance","Evaluate likelihood and impact of identified risks","Plan specific actions to address significant risks and opportunities","Actions must be integrated into QMS processes — not separate activities","Risk register must be maintained and reviewed regularly"]},
+    {title:"QUALITY OBJECTIVES",type:"ul",items:["Must be consistent with the quality policy","Must be measurable — data must support progress tracking","Must be monitored and communicated across the organization","Must be updated as the organization and context evolve","Examples: on-time delivery rate, first-pass yield, supplier quality index, customer complaints"]},
+    {title:"PLANNING FOR CHANGE",type:"ul",items:["When changes to the QMS are needed they must be planned and controlled","Consider: purpose and potential consequences of the change","Consider: integrity of the QMS — will it remain effective?","Consider: resource availability and allocation","Change management must prevent unintended degradation of QMS performance"]},
+    {title:"KEY TAGS",type:"tags",items:["Risk Management","Opportunity","Quality Objectives","Change Control","Measurable Targets","Risk Register"]},
+    {title:"RISK BOW-TIE MODEL — Threats, Event & Consequences",type:"diagram",svg:`<svg viewBox="0 0 820 200" xmlns="http://www.w3.org/2000/svg">
+  <!-- Left triangle — Threats -->
+  <polygon points="20,20 20,180 380,100" fill="rgba(255,64,96,0.13)" stroke="#ff4060" stroke-width="1.8"/>
+  <!-- Right triangle — Consequences -->
+  <polygon points="440,100 800,20 800,180" fill="rgba(245,176,0,0.13)" stroke="#f5b000" stroke-width="1.8"/>
+  <!-- Centre event circle -->
+  <circle cx="410" cy="100" r="36" fill="rgba(0,200,255,0.18)" stroke="#00c8ff" stroke-width="2.5"/>
+  <text x="410" y="97"  text-anchor="middle" font-family="Arial" font-size="11" font-weight="700" fill="#00c8ff">RISK</text>
+  <text x="410" y="111" text-anchor="middle" font-family="Arial" font-size="11" font-weight="700" fill="#00c8ff">EVENT</text>
+  <!-- Threat labels left side -->
+  <text x="12" y="44"  font-family="Arial" font-size="11" font-weight="700" fill="#ff4060">THREATS (Causes)</text>
+  <text x="28" y="66"  font-family="Arial" font-size="11" fill="#ccc">▸ Counterfeit parts</text>
+  <text x="28" y="82"  font-family="Arial" font-size="11" fill="#ccc">▸ Process non-conformance</text>
+  <text x="28" y="98"  font-family="Arial" font-size="11" fill="#ccc">▸ Supplier failure</text>
+  <text x="28" y="114" font-family="Arial" font-size="11" fill="#ccc">▸ Design error</text>
+  <text x="28" y="130" font-family="Arial" font-size="11" fill="#ccc">▸ Human error</text>
+  <text x="28" y="146" font-family="Arial" font-size="11" fill="#ccc">▸ Regulatory change</text>
+  <!-- Prevention label -->
+  <text x="185" y="158" text-anchor="middle" font-family="Arial" font-size="11" font-weight="700" fill="#ff4060">← PREVENTION CONTROLS</text>
+  <!-- Consequence labels right side -->
+  <text x="447" y="44"  font-family="Arial" font-size="11" font-weight="700" fill="#f5b000">CONSEQUENCES</text>
+  <text x="447" y="66"  font-family="Arial" font-size="11" fill="#ccc">▸ Product nonconformity</text>
+  <text x="447" y="82"  font-family="Arial" font-size="11" fill="#ccc">▸ Customer complaint</text>
+  <text x="447" y="98"  font-family="Arial" font-size="11" fill="#ccc">▸ Safety incident</text>
+  <text x="447" y="114" font-family="Arial" font-size="11" fill="#ccc">▸ Audit finding</text>
+  <text x="447" y="130" font-family="Arial" font-size="11" fill="#ccc">▸ Delivery delay</text>
+  <text x="447" y="146" font-family="Arial" font-size="11" fill="#ccc">▸ Certification loss</text>
+  <!-- Mitigation label -->
+  <text x="630" y="158" text-anchor="middle" font-family="Arial" font-size="11" font-weight="700" fill="#f5b000">MITIGATION CONTROLS →</text>
+  <!-- Bottom note -->
+  <text x="410" y="192" text-anchor="middle" font-family="Arial" font-size="11" fill="#888">AS9100 Cl.6.1 requires both PREVENTION and MITIGATION controls to be planned and implemented</text>
+</svg>`}
+  ]},
+  7:{title:"Support",badge:"CLAUSE 7",color:"green",num:"07",blocks:[
+    {title:"SUB-CLAUSES",type:"ul",items:["7.1 — Resources (people, infrastructure, environment, monitoring & measurement, organizational knowledge)","7.2 — Competence","7.3 — Awareness","7.4 — Communication","7.5 — Documented information"]},
+    {title:"RESOURCES",type:"ul",items:["People: sufficient competent personnel to operate and control QMS processes","Infrastructure: buildings, utilities, equipment, transportation, IT","Work Environment: physical, social, and psychological factors affecting product quality","In aerospace: clean rooms, ESD protection, temperature/humidity controls are critical","Monitoring & Measurement: calibrated, traceable measuring equipment","Organizational Knowledge: capture and retain critical institutional know-how"]},
+    {title:"COMPETENCE & AWARENESS",type:"ul",items:["Personnel must be competent based on education, training, skills, experience","Competency gaps must be identified and addressed","Evidence of competence must be retained as documented information","Personnel must be aware of: quality policy, their contribution to quality objectives","Personnel must understand consequences of not conforming to QMS requirements","Awareness includes ethical behavior — critical in defense and aerospace"]},
+    {title:"DOCUMENTED INFORMATION",type:"ul",items:["Must be controlled — current, approved versions available at point of use","Must be protected from loss, unauthorized access, or inappropriate use","Retention periods must be defined — especially for aerospace traceability","Change control must be applied to all controlled documents","Records must be legible, retrievable, and protected from damage"]},
+    {title:"KEY TAGS",type:"tags",items:["Competence","Calibration","Documented Info","Work Environment","Awareness","Organizational Knowledge","Change Control"]},
+    {title:"THE 5 PILLARS OF SUPPORT (Clause 7)",type:"diagram",svg:`<svg viewBox="0 0 820 220" xmlns="http://www.w3.org/2000/svg">
+  <!-- Roof / Header bar -->
+  <rect x="30" y="10" width="760" height="36" rx="5" fill="rgba(0,232,162,0.18)" stroke="#00e8a2" stroke-width="2"/>
+  <text x="410" y="33" text-anchor="middle" font-family="Arial" font-size="14" font-weight="700" fill="#00e8a2">EFFECTIVE QMS OPERATIONS — Enabled by Clause 7 Support</text>
+  <!-- 5 pillars -->
+  <rect x="40"  y="56" width="130" height="130" rx="5" fill="rgba(0,200,255,0.10)" stroke="#00c8ff" stroke-width="1.5"/>
+  <rect x="182" y="56" width="130" height="130" rx="5" fill="rgba(0,232,162,0.10)" stroke="#00e8a2" stroke-width="1.5"/>
+  <rect x="324" y="56" width="130" height="130" rx="5" fill="rgba(245,176,0,0.10)"  stroke="#f5b000" stroke-width="1.5"/>
+  <rect x="466" y="56" width="130" height="130" rx="5" fill="rgba(180,100,255,0.10)" stroke="#b46eff" stroke-width="1.5"/>
+  <rect x="608" y="56" width="130" height="130" rx="5" fill="rgba(255,64,96,0.10)"  stroke="#ff4060" stroke-width="1.5"/>
+  <!-- Pillar icons -->
+  <text x="105" y="98"  text-anchor="middle" font-family="Arial" font-size="28">👥</text>
+  <text x="247" y="98"  text-anchor="middle" font-family="Arial" font-size="28">🏭</text>
+  <text x="389" y="98"  text-anchor="middle" font-family="Arial" font-size="28">📐</text>
+  <text x="531" y="98"  text-anchor="middle" font-family="Arial" font-size="28">📢</text>
+  <text x="673" y="98"  text-anchor="middle" font-family="Arial" font-size="28">📂</text>
+  <!-- Pillar titles -->
+  <text x="105" y="116" text-anchor="middle" font-family="Arial" font-size="12" font-weight="700" fill="#00c8ff">7.1 & 7.2</text>
+  <text x="247" y="116" text-anchor="middle" font-family="Arial" font-size="12" font-weight="700" fill="#00e8a2">7.1</text>
+  <text x="389" y="116" text-anchor="middle" font-family="Arial" font-size="12" font-weight="700" fill="#f5b000">7.1 MSE</text>
+  <text x="531" y="116" text-anchor="middle" font-family="Arial" font-size="12" font-weight="700" fill="#b46eff">7.3 & 7.4</text>
+  <text x="673" y="116" text-anchor="middle" font-family="Arial" font-size="12" font-weight="700" fill="#ff4060">7.5</text>
+  <!-- Pillar names -->
+  <text x="105" y="133" text-anchor="middle" font-family="Arial" font-size="11" fill="#ccc">People &amp;</text>
+  <text x="105" y="147" text-anchor="middle" font-family="Arial" font-size="11" fill="#ccc">Competence</text>
+  <text x="247" y="133" text-anchor="middle" font-family="Arial" font-size="11" fill="#ccc">Infrastructure</text>
+  <text x="247" y="147" text-anchor="middle" font-family="Arial" font-size="11" fill="#ccc">&amp; Environment</text>
+  <text x="389" y="133" text-anchor="middle" font-family="Arial" font-size="11" fill="#ccc">Monitoring &amp;</text>
+  <text x="389" y="147" text-anchor="middle" font-family="Arial" font-size="11" fill="#ccc">Measurement</text>
+  <text x="531" y="133" text-anchor="middle" font-family="Arial" font-size="11" fill="#ccc">Awareness &amp;</text>
+  <text x="531" y="147" text-anchor="middle" font-family="Arial" font-size="11" fill="#ccc">Communication</text>
+  <text x="673" y="133" text-anchor="middle" font-family="Arial" font-size="11" fill="#ccc">Documented</text>
+  <text x="673" y="147" text-anchor="middle" font-family="Arial" font-size="11" fill="#ccc">Information</text>
+  <!-- Bottom base -->
+  <rect x="30" y="194" width="760" height="18" rx="4" fill="rgba(255,255,255,0.04)" stroke="rgba(255,255,255,0.12)" stroke-width="1"/>
+  <text x="410" y="207" text-anchor="middle" font-family="Arial" font-size="11" fill="#888">Foundation of Operational Excellence · All pillars required simultaneously</text>
+</svg>`}
+  ]},
+  8:{title:"Operations",badge:"CLAUSE 8",color:"red",num:"08",blocks:[
+    {title:"SUB-CLAUSES",full:true,type:"ul",items:["8.1 — Operational planning and control","8.2 — Requirements for products and services (customer communication, requirements review)","8.3 — Design and development of products and services","8.4 — Control of externally provided processes, products, and services (supplier control)","8.5 — Production and service provision (including FOD, tooling, work instructions, ESD)","8.6 — Release of products and services","8.7 — Control of nonconforming outputs"]},
+    {title:"OPERATIONAL PLANNING",type:"ul",items:["Determine requirements for products and services","Establish criteria for processes and acceptance of products","Determine resources needed to achieve conformity","Implement controls in accordance with the criteria","Retain documented evidence of conformance"]},
+    {title:"EXTERNAL PROVIDERS (8.4)",type:"ul",items:["Organization remains FULLY responsible for conformity of outsourced work","Supplier selection criteria must be defined and applied","Supplier performance must be monitored and evaluated","Flow-down of requirements to suppliers — including customer and regulatory requirements","Counterfeit part prevention requirements must be flowed down","Right of access: customer and regulatory authority to supplier facilities"]},
+    {title:"PRODUCTION CONTROLS (8.5)",type:"ul",items:["Work instructions under controlled conditions","Approved and calibrated equipment","Personnel competency verified before work","First Article Inspection (FAI) where required","Foreign Object Damage/Debris (FOD) prevention program","Electrostatic Discharge (ESD) controls","Production permit/deviation control","Product identification and traceability throughout production"]},
+    {title:"KEY TAGS",type:"tags",items:["Critical Items","Key Characteristics","FOD Prevention","ESD Control","Supplier Control","FAI","Traceability","Nonconformance","Product Safety","Work Instructions"]},
+    {title:"CLAUSE 8 OPERATIONS LIFECYCLE — End-to-End Flow",type:"diagram",svg:`<svg viewBox="0 0 820 230" xmlns="http://www.w3.org/2000/svg">
+  <!-- Step boxes -->
+  <!-- 8.2 Customer Requirements -->
+  <rect x="10"  y="50" width="108" height="70" rx="5" fill="rgba(0,200,255,0.13)" stroke="#00c8ff" stroke-width="1.8"/>
+  <text x="64"  y="76"  text-anchor="middle" font-family="Arial" font-size="11" font-weight="700" fill="#00c8ff">8.2</text>
+  <text x="64"  y="91"  text-anchor="middle" font-family="Arial" font-size="11" fill="#ccc">Customer</text>
+  <text x="64"  y="104" text-anchor="middle" font-family="Arial" font-size="11" fill="#ccc">Requirements</text>
+  <!-- Arrow -->
+  <line x1="118" y1="85" x2="134" y2="85" stroke="#ff4060" stroke-width="2"/><polygon points="130,81 138,85 130,89" fill="#ff4060"/>
+  <!-- 8.3 Design -->
+  <rect x="138" y="50" width="108" height="70" rx="5" fill="rgba(255,64,96,0.13)" stroke="#ff4060" stroke-width="1.8"/>
+  <text x="192" y="76"  text-anchor="middle" font-family="Arial" font-size="11" font-weight="700" fill="#ff4060">8.3</text>
+  <text x="192" y="91"  text-anchor="middle" font-family="Arial" font-size="11" fill="#ccc">Design &amp;</text>
+  <text x="192" y="104" text-anchor="middle" font-family="Arial" font-size="11" fill="#ccc">Development</text>
+  <!-- Arrow -->
+  <line x1="246" y1="85" x2="262" y2="85" stroke="#ff4060" stroke-width="2"/><polygon points="258,81 266,85 258,89" fill="#ff4060"/>
+  <!-- 8.4 Suppliers -->
+  <rect x="266" y="50" width="108" height="70" rx="5" fill="rgba(245,176,0,0.13)" stroke="#f5b000" stroke-width="1.8"/>
+  <text x="320" y="76"  text-anchor="middle" font-family="Arial" font-size="11" font-weight="700" fill="#f5b000">8.4</text>
+  <text x="320" y="91"  text-anchor="middle" font-family="Arial" font-size="11" fill="#ccc">External</text>
+  <text x="320" y="104" text-anchor="middle" font-family="Arial" font-size="11" fill="#ccc">Providers</text>
+  <!-- Arrow -->
+  <line x1="374" y1="85" x2="390" y2="85" stroke="#ff4060" stroke-width="2"/><polygon points="386,81 394,85 386,89" fill="#ff4060"/>
+  <!-- 8.5 Production -->
+  <rect x="394" y="50" width="108" height="70" rx="5" fill="rgba(255,64,96,0.16)" stroke="#ff4060" stroke-width="2.2"/>
+  <text x="448" y="76"  text-anchor="middle" font-family="Arial" font-size="11" font-weight="700" fill="#ff4060">8.5</text>
+  <text x="448" y="91"  text-anchor="middle" font-family="Arial" font-size="11" fill="#fff">Production &amp;</text>
+  <text x="448" y="104" text-anchor="middle" font-family="Arial" font-size="11" fill="#fff">Service</text>
+  <!-- Arrow -->
+  <line x1="502" y1="85" x2="518" y2="85" stroke="#ff4060" stroke-width="2"/><polygon points="514,81 522,85 514,89" fill="#ff4060"/>
+  <!-- 8.6 Release -->
+  <rect x="522" y="50" width="108" height="70" rx="5" fill="rgba(0,232,162,0.13)" stroke="#00e8a2" stroke-width="1.8"/>
+  <text x="576" y="76"  text-anchor="middle" font-family="Arial" font-size="11" font-weight="700" fill="#00e8a2">8.6</text>
+  <text x="576" y="91"  text-anchor="middle" font-family="Arial" font-size="11" fill="#ccc">Release of</text>
+  <text x="576" y="104" text-anchor="middle" font-family="Arial" font-size="11" fill="#ccc">Products</text>
+  <!-- Arrow -->
+  <line x1="630" y1="85" x2="646" y2="85" stroke="#ff4060" stroke-width="2"/><polygon points="642,81 650,85 642,89" fill="#ff4060"/>
+  <!-- 8.7 Nonconform -->
+  <rect x="650" y="50" width="108" height="70" rx="5" fill="rgba(180,100,255,0.13)" stroke="#b46eff" stroke-width="1.8"/>
+  <text x="704" y="76"  text-anchor="middle" font-family="Arial" font-size="11" font-weight="700" fill="#b46eff">8.7</text>
+  <text x="704" y="91"  text-anchor="middle" font-family="Arial" font-size="11" fill="#ccc">Nonconforming</text>
+  <text x="704" y="104" text-anchor="middle" font-family="Arial" font-size="11" fill="#ccc">Outputs</text>
+  <!-- Top bar: 8.1 Planning -->
+  <rect x="10" y="10" width="800" height="28" rx="4" fill="rgba(0,200,255,0.08)" stroke="#00c8ff" stroke-width="1.2" stroke-dasharray="5,3"/>
+  <text x="410" y="28" text-anchor="middle" font-family="Arial" font-size="12" font-weight="700" fill="#00c8ff">8.1 — Operational Planning and Control (governs the entire lifecycle)</text>
+  <!-- FOD / ESD / FAI badges below 8.5 -->
+  <rect x="382" y="132" width="52" height="20" rx="3" fill="rgba(255,64,96,0.15)" stroke="#ff4060" stroke-width="1"/>
+  <text x="408" y="146" text-anchor="middle" font-family="Arial" font-size="10" font-weight="700" fill="#ff4060">FOD</text>
+  <rect x="440" y="132" width="52" height="20" rx="3" fill="rgba(255,64,96,0.15)" stroke="#ff4060" stroke-width="1"/>
+  <text x="466" y="146" text-anchor="middle" font-family="Arial" font-size="10" font-weight="700" fill="#ff4060">ESD</text>
+  <rect x="498" y="132" width="52" height="20" rx="3" fill="rgba(255,64,96,0.15)" stroke="#ff4060" stroke-width="1"/>
+  <text x="524" y="146" text-anchor="middle" font-family="Arial" font-size="10" font-weight="700" fill="#ff4060">FAI</text>
+  <!-- Customer delivery end arrow -->
+  <line x1="758" y1="85" x2="808" y2="85" stroke="#00e8a2" stroke-width="2"/><polygon points="804,81 812,85 804,89" fill="#00e8a2"/>
+  <text x="814" y="82"  font-family="Arial" font-size="10" fill="#00e8a2">✈</text>
+  <text x="810" y="98"  font-family="Arial" font-size="10" fill="#00e8a2">Delivery</text>
+  <!-- Feedback loop arrow bottom -->
+  <path d="M 704,120 Q 704,175 410,175 Q 116,175 116,120" fill="none" stroke="#b46eff" stroke-width="1.5" stroke-dasharray="4,3"/>
+  <polygon points="112,120 120,116 116,124" fill="#b46eff"/>
+  <text x="410" y="190" text-anchor="middle" font-family="Arial" font-size="11" fill="#b46eff">↺ Nonconformances feed back into Corrective Action (Cl.10) → Process Improvement</text>
+  <!-- Supplier feedback bottom -->
+  <text x="410" y="210" text-anchor="middle" font-family="Arial" font-size="11" fill="#888">Organization retains FULL responsibility for all outsourced work (Cl.8.4)</text>
+</svg>`}
+  ]},
+  9:{title:"Performance Evaluation",badge:"CLAUSE 9",color:"",num:"09",blocks:[
+    {title:"SUB-CLAUSES",type:"ul",items:["9.1 — Monitoring, measurement, analysis, and evaluation","9.2 — Internal audit","9.3 — Management review"]},
+    {title:"MONITORING & MEASUREMENT",type:"ul",items:["Define what needs to be monitored and measured","Define how and when monitoring will be performed","Define how results will be analyzed and evaluated","Customer satisfaction must be monitored as a QMS performance indicator","Key aerospace metrics: on-time delivery, first-pass yield, supplier PPM, RCCA effectiveness"]},
+    {title:"INTERNAL AUDIT",type:"ul",items:["Internal audits must be planned at defined frequency","Audit criteria, scope, frequency, and methods must be defined","Auditors must be objective and impartial — cannot audit own work","Audit findings must be reported to relevant management","Corrective actions must be taken without undue delay","Results retained as documented information"]},
+    {title:"MANAGEMENT REVIEW",type:"ul",items:["Top management must conduct periodic management reviews","Inputs: audit results, customer satisfaction, process performance, nonconformities","Outputs: decisions on improvement opportunities, resource needs, QMS changes","Management review demonstrates leadership engagement with the QMS","Minutes and action items must be documented and followed up"]},
+    {title:"KEY TAGS",type:"tags",items:["Audit","Management Review","Customer Satisfaction","KPIs","Process Performance","Corrective Action","Documented Evidence"]},
+    {title:"PERFORMANCE EVALUATION CYCLE — Audit → Review → Improve",type:"diagram",svg:`<svg viewBox="0 0 820 220" xmlns="http://www.w3.org/2000/svg">
+  <!-- Left: Monitoring inputs -->
+  <rect x="10" y="20" width="180" height="180" rx="6" fill="rgba(0,200,255,0.08)" stroke="#00c8ff" stroke-width="1.5"/>
+  <text x="100" y="44" text-anchor="middle" font-family="Arial" font-size="12" font-weight="700" fill="#00c8ff">9.1 MONITOR &amp; MEASURE</text>
+  <text x="100" y="64"  text-anchor="middle" font-family="Arial" font-size="11" fill="#ccc">📦 Product conformity</text>
+  <text x="100" y="80"  text-anchor="middle" font-family="Arial" font-size="11" fill="#ccc">🚚 On-time delivery</text>
+  <text x="100" y="96"  text-anchor="middle" font-family="Arial" font-size="11" fill="#ccc">😊 Customer satisfaction</text>
+  <text x="100" y="112" text-anchor="middle" font-family="Arial" font-size="11" fill="#ccc">🏭 Process performance</text>
+  <text x="100" y="128" text-anchor="middle" font-family="Arial" font-size="11" fill="#ccc">🔧 Supplier PPM</text>
+  <text x="100" y="144" text-anchor="middle" font-family="Arial" font-size="11" fill="#ccc">✅ First-pass yield</text>
+  <text x="100" y="160" text-anchor="middle" font-family="Arial" font-size="11" fill="#ccc">📋 RCCA effectiveness</text>
+  <text x="100" y="188" text-anchor="middle" font-family="Arial" font-size="11" font-weight="700" fill="#00c8ff">DATA → EVIDENCE</text>
+  <!-- Arrow 1 -->
+  <line x1="190" y1="110" x2="215" y2="110" stroke="#00c8ff" stroke-width="2"/><polygon points="211,106 219,110 211,114" fill="#00c8ff"/>
+  <!-- Centre: Internal Audit -->
+  <rect x="219" y="20" width="180" height="180" rx="6" fill="rgba(245,176,0,0.10)" stroke="#f5b000" stroke-width="1.8"/>
+  <text x="309" y="44" text-anchor="middle" font-family="Arial" font-size="12" font-weight="700" fill="#f5b000">9.2 INTERNAL AUDIT</text>
+  <text x="309" y="68"  text-anchor="middle" font-family="Arial" font-size="11" fill="#ccc">Plan audit schedule</text>
+  <text x="309" y="84"  text-anchor="middle" font-family="Arial" font-size="11" fill="#ccc">Define scope &amp; criteria</text>
+  <text x="309" y="100" text-anchor="middle" font-family="Arial" font-size="11" fill="#ccc">Select impartial auditors</text>
+  <text x="309" y="116" text-anchor="middle" font-family="Arial" font-size="11" fill="#ccc">Conduct audit</text>
+  <text x="309" y="132" text-anchor="middle" font-family="Arial" font-size="11" fill="#ccc">Report findings</text>
+  <text x="309" y="148" text-anchor="middle" font-family="Arial" font-size="11" fill="#ccc">Raise nonconformities</text>
+  <text x="309" y="164" text-anchor="middle" font-family="Arial" font-size="11" fill="#ccc">Verify closure</text>
+  <text x="309" y="188" text-anchor="middle" font-family="Arial" font-size="11" font-weight="700" fill="#f5b000">VERIFY COMPLIANCE</text>
+  <!-- Arrow 2 -->
+  <line x1="399" y1="110" x2="424" y2="110" stroke="#f5b000" stroke-width="2"/><polygon points="420,106 428,110 420,114" fill="#f5b000"/>
+  <!-- Right: Management Review -->
+  <rect x="428" y="20" width="180" height="180" rx="6" fill="rgba(0,232,162,0.10)" stroke="#00e8a2" stroke-width="1.8"/>
+  <text x="518" y="44" text-anchor="middle" font-family="Arial" font-size="12" font-weight="700" fill="#00e8a2">9.3 MGMT REVIEW</text>
+  <text x="518" y="66"  text-anchor="middle" font-family="Arial" font-size="11" font-weight="700" fill="#888">INPUTS:</text>
+  <text x="518" y="82"  text-anchor="middle" font-family="Arial" font-size="11" fill="#ccc">Audit results</text>
+  <text x="518" y="98"  text-anchor="middle" font-family="Arial" font-size="11" fill="#ccc">Customer satisfaction data</text>
+  <text x="518" y="114" text-anchor="middle" font-family="Arial" font-size="11" fill="#ccc">Process performance</text>
+  <text x="518" y="130" text-anchor="middle" font-family="Arial" font-size="11" font-weight="700" fill="#888">OUTPUTS:</text>
+  <text x="518" y="146" text-anchor="middle" font-family="Arial" font-size="11" fill="#ccc">Improvement decisions</text>
+  <text x="518" y="162" text-anchor="middle" font-family="Arial" font-size="11" fill="#ccc">Resource changes</text>
+  <text x="518" y="188" text-anchor="middle" font-family="Arial" font-size="11" font-weight="700" fill="#00e8a2">LEADERSHIP ENGAGED</text>
+  <!-- Arrow 3 -->
+  <line x1="608" y1="110" x2="633" y2="110" stroke="#00e8a2" stroke-width="2"/><polygon points="629,106 637,110 629,114" fill="#00e8a2"/>
+  <!-- Output box -->
+  <rect x="637" y="50" width="173" height="120" rx="6" fill="rgba(180,100,255,0.12)" stroke="#b46eff" stroke-width="1.8"/>
+  <text x="723" y="76"  text-anchor="middle" font-family="Arial" font-size="12" font-weight="700" fill="#b46eff">OUTPUTS TO</text>
+  <text x="723" y="92"  text-anchor="middle" font-family="Arial" font-size="11" fill="#ccc">→ Clause 10</text>
+  <text x="723" y="108" text-anchor="middle" font-family="Arial" font-size="11" fill="#ccc">Improvement actions</text>
+  <text x="723" y="124" text-anchor="middle" font-family="Arial" font-size="11" fill="#ccc">→ Clause 6</text>
+  <text x="723" y="140" text-anchor="middle" font-family="Arial" font-size="11" fill="#ccc">Risk updates</text>
+  <text x="723" y="156" text-anchor="middle" font-family="Arial" font-size="11" fill="#ccc">→ QMS Evolution</text>
+</svg>`}
+  ]},
+  10:{title:"Improvement",badge:"CLAUSE 10",color:"green",num:"10",blocks:[
+    {title:"OVERVIEW",full:true,type:"p",content:"Clause 10 closes the PDCA (Plan-Do-Check-Act) loop. It ensures the organization learns from problems, customer feedback, audits, and performance data to systematically improve its QMS and operational performance. Improvement is not optional in AS9100 — it is a fundamental requirement embedded throughout the standard."},
+    {title:"NONCONFORMITY & CORRECTIVE ACTION",type:"ul",items:["When a nonconformity occurs: react and take action to control it","Evaluate the need to eliminate the root cause — not just the symptom","Implement corrective action proportional to the significance of the issue","Review the effectiveness of the corrective action taken","Update risks and opportunities if necessary","Make changes to the QMS if required","RCCA (Root Cause and Corrective Action) must be systematic and documented"]},
+    {title:"CONTINUAL IMPROVEMENT",type:"ul",items:["Organization must continually improve suitability, adequacy, and effectiveness of the QMS","Use results from analysis and evaluation, audit results, management review outputs","Identify areas for improvement and implement appropriate actions","Not just fixing defects — enhancing processes, reducing risks, improving efficiency","Customer satisfaction improvement is a key driver"]},
+    {title:"PDCA CONNECTION",type:"ul",items:["PLAN — Context (Cl.4), Leadership (Cl.5), Planning (Cl.6)","DO — Support (Cl.7), Operations (Cl.8)","CHECK — Performance Evaluation (Cl.9)","ACT — Improvement (Cl.10) → feeds back into Plan — the cycle continues"]},
+    {title:"KEY TAGS",type:"tags",items:["PDCA","RCCA","Root Cause","Corrective Action","Continual Improvement","Nonconformity","Effectiveness Review"]},
+    {title:"PDCA WHEEL — The Engine of Continual Improvement in AS9100",type:"diagram",svg:`<svg viewBox="0 0 820 300" xmlns="http://www.w3.org/2000/svg">
+  <!-- PDCA Wheel Centre -->
+  <circle cx="280" cy="152" r="120" fill="rgba(255,255,255,0.03)" stroke="rgba(255,255,255,0.1)" stroke-width="1"/>
+  <!-- PLAN quadrant -->
+  <path d="M280,152 L280,34 A118,118 0 0,1 398,152 Z" fill="rgba(0,200,255,0.22)" stroke="#00c8ff" stroke-width="2"/>
+  <!-- DO quadrant -->
+  <path d="M280,152 L398,152 A118,118 0 0,1 280,270 Z" fill="rgba(0,232,162,0.22)" stroke="#00e8a2" stroke-width="2"/>
+  <!-- CHECK quadrant -->
+  <path d="M280,152 L280,270 A118,118 0 0,1 162,152 Z" fill="rgba(245,176,0,0.22)" stroke="#f5b000" stroke-width="2"/>
+  <!-- ACT quadrant -->
+  <path d="M280,152 L162,152 A118,118 0 0,1 280,34 Z" fill="rgba(255,64,96,0.22)" stroke="#ff4060" stroke-width="2"/>
+  <!-- Centre circle -->
+  <circle cx="280" cy="152" r="38" fill="rgba(10,14,26,0.9)" stroke="rgba(255,255,255,0.2)" stroke-width="1.5"/>
+  <text x="280" y="148" text-anchor="middle" font-family="Arial" font-size="13" font-weight="700" fill="#fff">PDCA</text>
+  <text x="280" y="164" text-anchor="middle" font-family="Arial" font-size="11" fill="#aaa">AS9100</text>
+  <!-- Quadrant labels -->
+  <text x="340" y="92"  text-anchor="middle" font-family="Arial" font-size="18" font-weight="700" fill="#00c8ff">P</text>
+  <text x="340" y="108" text-anchor="middle" font-family="Arial" font-size="11" font-weight="700" fill="#00c8ff">PLAN</text>
+  <text x="350" y="212" text-anchor="middle" font-family="Arial" font-size="18" font-weight="700" fill="#00e8a2">D</text>
+  <text x="350" y="228" text-anchor="middle" font-family="Arial" font-size="11" font-weight="700" fill="#00e8a2">DO</text>
+  <text x="218" y="212" text-anchor="middle" font-family="Arial" font-size="18" font-weight="700" fill="#f5b000">C</text>
+  <text x="218" y="228" text-anchor="middle" font-family="Arial" font-size="11" font-weight="700" fill="#f5b000">CHECK</text>
+  <text x="210" y="92"  text-anchor="middle" font-family="Arial" font-size="18" font-weight="700" fill="#ff4060">A</text>
+  <text x="210" y="108" text-anchor="middle" font-family="Arial" font-size="11" font-weight="700" fill="#ff4060">ACT</text>
+  <!-- Rotation arrow -->
+  <path d="M280,22 A130,130 0 0,1 410,152" fill="none" stroke="rgba(255,255,255,0.25)" stroke-width="2" stroke-dasharray="5,3"/>
+  <polygon points="406,148 414,152 406,156" fill="rgba(255,255,255,0.35)"/>
+  <!-- Right side: Clause mapping -->
+  <rect x="460" y="10" width="350" height="280" rx="6" fill="rgba(255,255,255,0.03)" stroke="rgba(255,255,255,0.1)" stroke-width="1"/>
+  <text x="635" y="34" text-anchor="middle" font-family="Arial" font-size="13" font-weight="700" fill="#fff">AS9100 CLAUSE MAPPING TO PDCA</text>
+  <!-- PLAN row -->
+  <rect x="475" y="46" width="50" height="52" rx="4" fill="rgba(0,200,255,0.2)" stroke="#00c8ff" stroke-width="1.5"/>
+  <text x="500" y="66"  text-anchor="middle" font-family="Arial" font-size="16" font-weight="700" fill="#00c8ff">P</text>
+  <text x="500" y="90"  text-anchor="middle" font-family="Arial" font-size="10" fill="#00c8ff">PLAN</text>
+  <text x="538" y="58"  font-family="Arial" font-size="12" font-weight="700" fill="#00c8ff">Clauses 4, 5, 6</text>
+  <text x="538" y="74"  font-family="Arial" font-size="11" fill="#aaa">Context · Leadership · Planning</text>
+  <text x="538" y="90"  font-family="Arial" font-size="11" fill="#aaa">SWOT · Risk · Objectives</text>
+  <!-- DO row -->
+  <rect x="475" y="108" width="50" height="52" rx="4" fill="rgba(0,232,162,0.2)" stroke="#00e8a2" stroke-width="1.5"/>
+  <text x="500" y="128" text-anchor="middle" font-family="Arial" font-size="16" font-weight="700" fill="#00e8a2">D</text>
+  <text x="500" y="152" text-anchor="middle" font-family="Arial" font-size="10" fill="#00e8a2">DO</text>
+  <text x="538" y="120" font-family="Arial" font-size="12" font-weight="700" fill="#00e8a2">Clauses 7, 8</text>
+  <text x="538" y="136" font-family="Arial" font-size="11" fill="#aaa">Support · Operations</text>
+  <text x="538" y="152" font-family="Arial" font-size="11" fill="#aaa">Resources · Production · FAI · FOD</text>
+  <!-- CHECK row -->
+  <rect x="475" y="170" width="50" height="52" rx="4" fill="rgba(245,176,0,0.2)" stroke="#f5b000" stroke-width="1.5"/>
+  <text x="500" y="190" text-anchor="middle" font-family="Arial" font-size="16" font-weight="700" fill="#f5b000">C</text>
+  <text x="500" y="214" text-anchor="middle" font-family="Arial" font-size="10" fill="#f5b000">CHECK</text>
+  <text x="538" y="182" font-family="Arial" font-size="12" font-weight="700" fill="#f5b000">Clause 9</text>
+  <text x="538" y="198" font-family="Arial" font-size="11" fill="#aaa">Performance Evaluation</text>
+  <text x="538" y="214" font-family="Arial" font-size="11" fill="#aaa">Audits · Monitoring · Mgmt Review</text>
+  <!-- ACT row -->
+  <rect x="475" y="232" width="50" height="48" rx="4" fill="rgba(255,64,96,0.2)" stroke="#ff4060" stroke-width="1.5"/>
+  <text x="500" y="252" text-anchor="middle" font-family="Arial" font-size="16" font-weight="700" fill="#ff4060">A</text>
+  <text x="500" y="272" text-anchor="middle" font-family="Arial" font-size="10" fill="#ff4060">ACT</text>
+  <text x="538" y="244" font-family="Arial" font-size="12" font-weight="700" fill="#ff4060">Clause 10</text>
+  <text x="538" y="260" font-family="Arial" font-size="11" fill="#aaa">Improvement · Corrective Action</text>
+  <text x="538" y="276" font-family="Arial" font-size="11" fill="#aaa">RCCA · Root Cause · Prevention</text>
+</svg>`}
+  ]}
+};
+
+const colorMap = {gold:'gold-b', green:'green-b', red:'red-b', '':"" };
+
+// ══════════════════════════════════════════════════
+//  OVERLAY
+// ══════════════════════════════════════════════════
+function openClause(n) {
+  const c = CLAUSES[n];
+  const panel = document.getElementById('overlayPanel');
+  document.getElementById('ovNum').textContent  = c.num;
+  document.getElementById('ovBadge').textContent = c.badge;
+  document.getElementById('ovTitle').textContent = c.title;
+  panel.className = 'overlay-panel ' + (colorMap[c.color] || '');
+  const tc = c.color==='gold'?'gold':c.color==='red'?'red':c.color==='green'?'green':'';
+
+  const regularBlocks = c.blocks.filter(b => b.type !== 'diagram');
+  const diagramBlocks = c.blocks.filter(b => b.type === 'diagram');
+
+  // ── LEFT PANE: all text blocks ──
+  let leftHtml = '';
+  regularBlocks.forEach(b => {
+    leftHtml += '<div class="ov-block"><div class="ov-block-title">'+b.title+'</div>';
+    if (b.type === 'p') {
+      leftHtml += '<p>'+b.content+'</p>';
+    } else if (b.type === 'ul') {
+      leftHtml += '<ul>';
+      b.items.forEach(it => { leftHtml += '<li>'+it+'</li>'; });
+      leftHtml += '</ul>';
+    } else if (b.type === 'tags') {
+      leftHtml += '<div class="ov-tags-wrap">';
+      b.items.forEach(t => { leftHtml += '<span class="ov-tag '+tc+'">'+t+'</span>'; });
+      leftHtml += '</div>';
+    }
+    leftHtml += '</div>';
+  });
+  document.getElementById('ovLeft').innerHTML = leftHtml;
+
+  // ── RIGHT PANE: diagram(s) ──
+  let rightHtml = '';
+  if (diagramBlocks.length > 0) {
+    diagramBlocks.forEach(b => {
+      rightHtml += '<div class="ov-diagram-wrap">'
+        + '<div class="ov-diagram-title">'+b.title+'</div>'
+        + b.svg
+        + '</div>';
+    });
+  } else {
+    // No diagram — show a summary panel
+    rightHtml = '<div class="ov-diagram-wrap" style="align-items:center;justify-content:center;display:flex;flex-direction:column;gap:1rem;opacity:0.4;">'
+      + '<div style="font-size:4rem;">📋</div>'
+      + '<div style="font-family:Arial;font-size:14px;color:var(--muted);text-align:center;">Refer to left panel<br>for full details</div>'
+      + '</div>';
+  }
+  document.getElementById('ovRight').innerHTML = rightHtml;
+
+  // Reset scroll positions
+  document.getElementById('ovLeft').scrollTop  = 0;
+  document.getElementById('ovRight').scrollTop = 0;
+
+  document.getElementById('overlayBackdrop').classList.add('open');
+  markDone(n);
+}
+function closeOverlay() { document.getElementById('overlayBackdrop').classList.remove('open'); }
+function closeOverlayIfBg(e) { if (e.target === document.getElementById('overlayBackdrop')) closeOverlay(); }
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeOverlay(); });
+
+// ══════════════════════════════════════════════════
+//  NAVIGATION
+// ══════════════════════════════════════════════════
+function showSection(id, btn) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('sec-' + id).classList.add('active');
+  if (btn) btn.classList.add('active');
+}
+
+// ══════════════════════════════════════════════════
+//  PROGRESS TRACKER
+// ══════════════════════════════════════════════════
+const clauseLabels = ['CL.1','CL.2','CL.3','CL.4','CL.5','CL.6','CL.7','CL.8','CL.9','CL.10'];
+const doneSet = new Set();
+function buildProgress() {
+  const t = document.getElementById('progressTrack');
+  clauseLabels.forEach((lbl, i) => {
+    const step = document.createElement('div');
+    step.className = 'prog-step';
+    step.innerHTML = `<div class="prog-circle" id="pc-${i+1}">${i+1}</div><div class="prog-label">${lbl}</div>`;
+    t.appendChild(step);
+    if (i < clauseLabels.length - 1) {
+      const line = document.createElement('div');
+      line.className = 'prog-line'; line.id = 'pl-' + (i+1);
+      t.appendChild(line);
+    }
+  });
+}
+function markDone(n) {
+  if (doneSet.has(n)) return;
+  doneSet.add(n);
+  const pc = document.getElementById('pc-' + n);
+  if (pc) pc.classList.add('done');
+  if (n < 10) { const pl = document.getElementById('pl-' + n); if (pl) pl.classList.add('done'); }
+}
+buildProgress();
+
+// ══════════════════════════════════════════════════
+//  Q&A FILE HANDLING  — with persistent clause tags
+// ══════════════════════════════════════════════════
+// uploadedFiles = [{file, clauses:Set, objectURL}]
+let uploadedFiles = [];
+let activeFileIdx = -1;
+let activeObjectURL = null;
+let activeFilterClause = 'all';
+
+function handleFiles(files) {
+  Array.from(files).forEach(f => {
+    if (!uploadedFiles.find(u => u.name === f.name)) {
+      uploadedFiles.push({ file: f, name: f.name, clauses: new Set(), objectURL: null });
+    }
+  });
+  renderFileList();
+}
+
+function toggleClauseTag(fileIdx, clauseNum) {
+  const u = uploadedFiles[fileIdx];
+  if (!u) return;
+  if (u.clauses.has(clauseNum)) {
+    u.clauses.delete(clauseNum);
+  } else {
+    u.clauses.add(clauseNum);
+  }
+  renderFileList();
+}
+
+function renderFileList() {
+  const c = document.getElementById('fileListContainer');
+  const filtered = activeFilterClause === 'all'
+    ? uploadedFiles
+    : uploadedFiles.filter(u => u.clauses.has(activeFilterClause) || u.clauses.size === 0);
+
+  if (uploadedFiles.length === 0) {
+    c.innerHTML = '<div class="empty-msg">No documents uploaded yet.<br>Upload Q&amp;A documents above.</div>';
+    return;
+  }
+  if (filtered.length === 0) {
+    c.innerHTML = `<div class="empty-msg">No documents tagged to Clause ${activeFilterClause} yet.<br>Tag documents using the clause pills below each file.</div>`;
+    return;
+  }
+
+  c.innerHTML = filtered.map(u => {
+    const realIdx = uploadedFiles.indexOf(u);
+    const ext = u.file.name.split('.').pop().toLowerCase();
+    const icon = ext === 'pdf' ? '📕' : ext === 'txt' ? '📄' : '📘';
+    const kb = (u.file.size / 1024).toFixed(1);
+    const isActive = realIdx === activeFileIdx;
+
+    // Build clause pills 1–10
+    const pills = [1,2,3,4,5,6,7,8,9,10].map(n => {
+      const tagged = u.clauses.has(String(n));
+      return `<button class="ct-pill${tagged?' tagged':''}" onclick="event.stopPropagation();toggleClauseTag(${realIdx},'${n}')">CL.${n}</button>`;
+    }).join('');
+
+    return `<div class="file-item-wrap">
+      <div class="file-item${isActive?' active-file':''}" onclick="viewFile(${realIdx})">
+        <span class="file-icon-lg">${icon}</span>
+        <div class="file-info">
+          <div class="file-name" title="${u.file.name}">${u.file.name}</div>
+          <div class="file-meta">${kb} KB · .${ext.toUpperCase()}${u.clauses.size>0?' · Tags: CL.'+[...u.clauses].join(', CL.'):''}</div>
+        </div>
+        <div class="file-actions">
+          <button class="fa-btn open-btn" onclick="event.stopPropagation();viewFile(${realIdx})">VIEW</button>
+          <button class="fa-btn del-btn" onclick="event.stopPropagation();removeFile(${realIdx})">✕</button>
+        </div>
+      </div>
+      <div class="clause-tag-row">
+        <span class="ct-label">Tag to:</span>
+        ${pills}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function viewFile(i) {
+  activeFileIdx = i;
+  const u = uploadedFiles[i];
+  const f = u.file;
+  const ext = f.name.split('.').pop().toLowerCase();
+  const icon = ext === 'pdf' ? '📕' : ext === 'txt' ? '📄' : '📘';
+  const kb = (f.size / 1024).toFixed(1);
+
+  document.getElementById('vFileIcon').textContent = icon;
+  document.getElementById('vFileName').textContent = f.name;
+  document.getElementById('vFileMeta').textContent = `${kb} KB · ${ext.toUpperCase()}`;
+
+  // hide all
+  document.getElementById('viewer-placeholder').style.display = 'none';
+  document.getElementById('viewer-iframe').style.display = 'none';
+  document.getElementById('viewer-txt').style.display = 'none';
+  document.getElementById('btnOpenExternal').style.display = 'none';
+  document.getElementById('btnDownload').style.display = 'none';
+
+  if (activeObjectURL) { URL.revokeObjectURL(activeObjectURL); activeObjectURL = null; }
+
+  if (ext === 'txt') {
+    const reader = new FileReader();
+    reader.onload = e => {
+      const el = document.getElementById('viewer-txt');
+      el.textContent = e.target.result;
+      el.style.display = 'block';
+    };
+    reader.readAsText(f);
+    document.getElementById('btnDownload').style.display = 'inline-block';
+  } else if (ext === 'pdf') {
+    const url = URL.createObjectURL(f);
+    activeObjectURL = url;
+    const iframe = document.getElementById('viewer-iframe');
+    iframe.src = url;
+    iframe.style.display = 'block';
+    document.getElementById('btnOpenExternal').style.display = 'inline-block';
+    document.getElementById('btnDownload').style.display = 'inline-block';
+  } else {
+    // Word or other
+    const url = URL.createObjectURL(f);
+    activeObjectURL = url;
+    const ph = document.getElementById('viewer-placeholder');
+    ph.style.display = 'flex';
+    ph.querySelector('p').innerHTML = `<b style="color:var(--text);">${f.name}</b><br><br>
+      Word documents (.docx/.doc) cannot be rendered directly in the browser viewer.<br><br>
+      <span style="color:var(--accent);">Use the buttons top-right:<br>
+      ⬡ Open in Browser — opens in a new tab<br>
+      ⬇ Download — saves to your device</span>`;
+    document.getElementById('btnOpenExternal').style.display = 'inline-block';
+    document.getElementById('btnDownload').style.display = 'inline-block';
+  }
+  renderFileList();
+}
+
+function openExternal() {
+  if (!activeObjectURL && activeFileIdx >= 0) {
+    activeObjectURL = URL.createObjectURL(uploadedFiles[activeFileIdx].file);
+  }
+  if (activeObjectURL) window.open(activeObjectURL, '_blank');
+}
+
+function downloadFile() {
+  if (activeFileIdx < 0) return;
+  const u = uploadedFiles[activeFileIdx];
+  const url = URL.createObjectURL(u.file);
+  const a = document.createElement('a');
+  a.href = url; a.download = u.file.name; a.click();
+  setTimeout(() => URL.revokeObjectURL(url), 1500);
+}
+
+function removeFile(i) {
+  if (uploadedFiles[i].objectURL) URL.revokeObjectURL(uploadedFiles[i].objectURL);
+  uploadedFiles.splice(i, 1);
+  if (activeFileIdx === i) { activeFileIdx = -1; resetViewer(); }
+  else if (activeFileIdx > i) { activeFileIdx--; }
+  renderFileList();
+}
+
+function resetViewer() {
+  const ph = document.getElementById('viewer-placeholder');
+  ph.style.display = 'flex';
+  ph.querySelector('p').innerHTML = `Select a document from the left to view it here.<br><br>
+    <span style="font-family:Arial,sans-serif;font-size:12px;color:var(--accent);">
+    TXT → rendered inline &nbsp;|&nbsp; PDF → embedded viewer<br>Word → Open in Browser or Download</span>`;
+  document.getElementById('viewer-iframe').style.display = 'none';
+  document.getElementById('viewer-txt').style.display = 'none';
+  document.getElementById('btnOpenExternal').style.display = 'none';
+  document.getElementById('btnDownload').style.display = 'none';
+  document.getElementById('vFileName').textContent = 'Document Viewer';
+  document.getElementById('vFileMeta').textContent = 'Select a document from the list';
+  document.getElementById('vFileIcon').textContent = '📄';
+}
+
+function filterClause(cl, btn) {
+  document.querySelectorAll('.cf-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  activeFilterClause = cl;
+  renderFileList();
+}
+
+function dragOver(e) { e.preventDefault(); document.getElementById('dropZone').classList.add('drag-over'); }
+function dragLeave(e) { document.getElementById('dropZone').classList.remove('drag-over'); }
+function dropFile(e) {
+  e.preventDefault();
+  document.getElementById('dropZone').classList.remove('drag-over');
+  handleFiles(e.dataTransfer.files);
+}
+</script>
+</body>
+</html>
